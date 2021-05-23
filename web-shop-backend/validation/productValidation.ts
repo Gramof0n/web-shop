@@ -1,26 +1,31 @@
-import { pool } from "../db";
-import { Product, res } from "../types";
+import { Product } from "../entities/Product";
+import { getRepository } from "typeorm";
+import { Product_type, res } from "../types";
 
-export const productValidation = async (res: res, Product: Product) => {
+export const productValidation = async (res: res, Prod: Product_type) => {
   try {
-    let { rowCount } = await pool.query(`SELECT * FROM product`);
+    const productRepository = getRepository(Product);
+    const data = await productRepository.find();
 
-    if (rowCount !== 0) {
-      const dbProduct = await pool.query(
-        `SELECT * FROM product WHERE name = '${Product.name}' AND category = '${Product.category}'`
-      );
+    if (data.length === 0) {
+      return true;
+    }
 
-      //already exists
-      if (dbProduct.rowCount > 0) {
-        process.env.NODE_ENV == "test"
-          ? ""
-          : res.json({ error: { message: "Item already in database" } });
-        return false;
-      }
+    const dbProduct = await productRepository.find({
+      name: Prod.name,
+      category: Prod.category,
+    });
+
+    //already exists
+    if (Object.keys(dbProduct).length > 0) {
+      process.env.NODE_ENV == "test"
+        ? ""
+        : res.json({ error: { message: "Item already in database" } });
+      return false;
     }
 
     //name empty
-    if (!Product.name || Product.name.length === 0) {
+    if (!Prod.name || Prod.name.length === 0) {
       process.env.NODE_ENV == "test"
         ? ""
         : res.json({
@@ -31,7 +36,7 @@ export const productValidation = async (res: res, Product: Product) => {
 
     //description empty
 
-    if (!Product.description || Product.description.length === 0) {
+    if (!Prod.description || Prod.description.length === 0) {
       process.env.NODE_ENV == "test"
         ? ""
         : res.json({
@@ -44,7 +49,7 @@ export const productValidation = async (res: res, Product: Product) => {
     }
 
     //category empty
-    if (!Product.category || Product.category.length === 0) {
+    if (!Prod.category || Prod.category.length === 0) {
       process.env.NODE_ENV == "test"
         ? ""
         : res.json({
@@ -54,7 +59,7 @@ export const productValidation = async (res: res, Product: Product) => {
     }
 
     //price empty
-    if (!Product.price) {
+    if (!Prod.price) {
       process.env.NODE_ENV == "test"
         ? ""
         : res.json({
@@ -64,7 +69,7 @@ export const productValidation = async (res: res, Product: Product) => {
             },
           });
       return false;
-    } else if (isNaN(Product.price)) {
+    } else if (isNaN(Prod.price)) {
       process.env.NODE_ENV == "test"
         ? ""
         : res.json({
@@ -74,7 +79,7 @@ export const productValidation = async (res: res, Product: Product) => {
             },
           });
       return false;
-    } else if (Product.price < 0) {
+    } else if (Prod.price < 0) {
       process.env.NODE_ENV == "test"
         ? ""
         : res.json({
@@ -87,7 +92,7 @@ export const productValidation = async (res: res, Product: Product) => {
     }
 
     //amount empty
-    if (!Product.amount) {
+    if (!Prod.amount) {
       process.env.NODE_ENV == "test"
         ? ""
         : res.json({
@@ -97,7 +102,7 @@ export const productValidation = async (res: res, Product: Product) => {
             },
           });
       return false;
-    } else if (isNaN(Product.amount)) {
+    } else if (isNaN(Prod.amount)) {
       process.env.NODE_ENV == "test"
         ? ""
         : res.json({
@@ -107,7 +112,7 @@ export const productValidation = async (res: res, Product: Product) => {
             },
           });
       return false;
-    } else if (Product.amount < 0) {
+    } else if (Prod.amount < 0) {
       process.env.NODE_ENV == "test"
         ? ""
         : res.json({

@@ -1,100 +1,116 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.productValidation = void 0;
-const db_1 = require("../db");
-const productValidation = (res, Product) => __awaiter(void 0, void 0, void 0, function* () {
+const Product_1 = require("../entities/Product");
+const typeorm_1 = require("typeorm");
+const productValidation = async (res, Prod) => {
     try {
-        let { rowCount } = yield db_1.pool.query(`SELECT * FROM product`);
-        if (rowCount !== 0) {
-            console.log("IMA U BAZI NESTO " + rowCount);
-            const dbProduct = yield db_1.pool.query(`SELECT * FROM product WHERE name = '${Product.name}' AND category = '${Product.category}'`);
-            if (dbProduct.rowCount > 0) {
-                res.json({ error: { message: "Item already in database" } });
-                return false;
-            }
+        const productRepository = typeorm_1.getRepository(Product_1.Product);
+        const data = await productRepository.find();
+        if (data.length === 0) {
+            return true;
         }
-        if (!Product.name || Product.name.length === 0) {
-            console.log("Ime prazno");
-            res.json({ error: { field: "name", message: "Name must not be empty" } });
+        const dbProduct = await productRepository.find({
+            name: Prod.name,
+            category: Prod.category,
+        });
+        if (Object.keys(dbProduct).length > 0) {
+            process.env.NODE_ENV == "test"
+                ? ""
+                : res.json({ error: { message: "Item already in database" } });
             return false;
         }
-        if (!Product.description || Product.description.length === 0) {
-            res.json({
-                error: {
-                    field: "description",
-                    message: "Description must not be empty",
-                },
-            });
+        if (!Prod.name || Prod.name.length === 0) {
+            process.env.NODE_ENV == "test"
+                ? ""
+                : res.json({
+                    error: { field: "name", message: "Name must not be empty" },
+                });
             return false;
         }
-        if (!Product.category || Product.category.length === 0) {
-            console.log("Kategorija prazna");
-            res.json({
-                error: { field: "category", message: "Category must not be empty" },
-            });
+        if (!Prod.description || Prod.description.length === 0) {
+            process.env.NODE_ENV == "test"
+                ? ""
+                : res.json({
+                    error: {
+                        field: "description",
+                        message: "Description must not be empty",
+                    },
+                });
             return false;
         }
-        if (!Product.price) {
-            res.json({
-                error: {
-                    field: "price",
-                    message: "Price must not be empty",
-                },
-            });
+        if (!Prod.category || Prod.category.length === 0) {
+            process.env.NODE_ENV == "test"
+                ? ""
+                : res.json({
+                    error: { field: "category", message: "Category must not be empty" },
+                });
             return false;
         }
-        else if (isNaN(Product.price)) {
-            res.json({
-                error: {
-                    field: "price",
-                    message: "Price must be numeric",
-                },
-            });
+        if (!Prod.price) {
+            process.env.NODE_ENV == "test"
+                ? ""
+                : res.json({
+                    error: {
+                        field: "price",
+                        message: "Price must not be empty",
+                    },
+                });
             return false;
         }
-        else if (Product.price < 0) {
-            res.json({
-                error: {
-                    field: "price",
-                    message: "Price must be positive",
-                },
-            });
+        else if (isNaN(Prod.price)) {
+            process.env.NODE_ENV == "test"
+                ? ""
+                : res.json({
+                    error: {
+                        field: "price",
+                        message: "Price must be numeric",
+                    },
+                });
             return false;
         }
-        if (!Product.amount) {
-            res.json({
-                error: {
-                    field: "amount",
-                    message: "Amount must not be empty",
-                },
-            });
+        else if (Prod.price < 0) {
+            process.env.NODE_ENV == "test"
+                ? ""
+                : res.json({
+                    error: {
+                        field: "price",
+                        message: "Price must be positive",
+                    },
+                });
             return false;
         }
-        else if (isNaN(Product.amount)) {
-            res.json({
-                error: {
-                    field: "amount",
-                    message: "Amount must be numeric",
-                },
-            });
+        if (!Prod.amount) {
+            process.env.NODE_ENV == "test"
+                ? ""
+                : res.json({
+                    error: {
+                        field: "amount",
+                        message: "Amount must not be empty",
+                    },
+                });
             return false;
         }
-        else if (Product.amount < 0) {
-            res.json({
-                error: {
-                    field: "amount",
-                    message: "Amount must be positive",
-                },
-            });
+        else if (isNaN(Prod.amount)) {
+            process.env.NODE_ENV == "test"
+                ? ""
+                : res.json({
+                    error: {
+                        field: "amount",
+                        message: "Amount must be numeric",
+                    },
+                });
+            return false;
+        }
+        else if (Prod.amount < 0) {
+            process.env.NODE_ENV == "test"
+                ? ""
+                : res.json({
+                    error: {
+                        field: "amount",
+                        message: "Amount must be positive",
+                    },
+                });
             return false;
         }
         return true;
@@ -103,6 +119,6 @@ const productValidation = (res, Product) => __awaiter(void 0, void 0, void 0, fu
         res.json({ error: err });
         return false;
     }
-});
+};
 exports.productValidation = productValidation;
 //# sourceMappingURL=productValidation.js.map

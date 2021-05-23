@@ -10,5 +10,7 @@ const router = express_1.default.Router();
 router.get("/products", products_1.getAllProducts);
 router.get("/products/:id", products_1.getSingleProduct);
 router.post("/products", multer_1.upload.single("productImage"), products_1.addProduct);
+router.delete("/products/:id", products_1.deleteProduct);
+router.put("/products/:id", multer_1.upload.single("productImage"), products_1.updateProduct);
 exports.default = router;
 //# sourceMappingURL=products.js.map

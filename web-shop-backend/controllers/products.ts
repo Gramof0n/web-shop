@@ -1,14 +1,16 @@
-import { pool } from "../db";
-import { Product, req, res } from "../types";
+import { Product } from "../entities/Product";
+import { getRepository } from "typeorm";
+import { Product_type, req, res } from "../types";
 import { productValidation } from "../validation/productValidation";
 
 //get all
 export const getAllProducts = async (_: req, res: res) => {
   try {
-    const data = await pool.query("SELECT * FROM product");
+    const productRepository = getRepository(Product);
+    const data = await productRepository.find();
 
-    if (data.rowCount > 0) {
-      res.json(data.rows);
+    if (data.length > 0) {
+      res.json(data);
       return;
     }
 
@@ -21,13 +23,12 @@ export const getAllProducts = async (_: req, res: res) => {
 //get one
 export const getSingleProduct = async (req: req, res: res) => {
   try {
-    const data = await pool.query(
-      `SELECT * FROM product WHERE product_id = ${req.params.id}`
-    );
+    const productRepository = getRepository(Product);
 
-    if (data.rowCount > 0) {
-      console.log("http://localhost:4000/" + data.rows[0].img_url);
-      res.json(data.rows[0]);
+    const data = await productRepository.findOne(req.params.id);
+
+    if (Object.keys(data!).length > 0) {
+      res.json(data);
       return;
     } else {
       res.json({ error: { message: "No such product" } });
@@ -42,6 +43,8 @@ export const addProduct = async (req: req, res: res) => {
   try {
     let productImage;
 
+    const productRepository = getRepository(Product);
+
     if (!req.file) {
       productImage = `uploads\\default.png`;
     } else {
@@ -49,31 +52,19 @@ export const addProduct = async (req: req, res: res) => {
       console.log(req.file.path);
     }
 
-    const Product: Product = {
+    const prod: Product_type = {
       name: req.body.name,
       description: req.body.description,
-      productImage,
+      img_url: productImage,
       amount: req.body.amount,
       category: req.body.category,
       price: req.body.price,
     };
 
     //validate
-    if (!(await productValidation(res, Product))) return;
+    if (!(await productValidation(res, prod))) return;
 
-    const values = [
-      Product.name,
-      Product.description,
-      Product.productImage,
-      Product.amount,
-      Product.category,
-      Product.price,
-    ];
-
-    await pool.query(
-      `INSERT INTO product (name, description, img_url, amount, category, price ) VALUES ($1,$2,$3,$4,$5,$6)`,
-      values
-    );
+    await productRepository.save(prod);
 
     res.json({ message: "Added product successfully" });
   } catch (err) {
@@ -84,7 +75,9 @@ export const addProduct = async (req: req, res: res) => {
 //delete
 export const deleteProduct = async (req: req, res: res) => {
   try {
-    await pool.query(`DELETE FROM product WHERE product_id = ${req.params.id}`);
+    const productRepository = getRepository(Product);
+
+    await productRepository.delete(req.params.id);
     res.json({ message: "Product successfully deleted" });
   } catch (err) {
     res.json({ message: "No such product", error: err });
@@ -92,3 +85,32 @@ export const deleteProduct = async (req: req, res: res) => {
 };
 
 //update
+export const updateProduct = async (req: req, res: res) => {
+  try {
+    let productImage;
+
+    const productRepository = getRepository(Product);
+
+    if (!req.file) {
+      productImage = `uploads\\default.png`;
+    } else {
+      productImage = req.file.path;
+      console.log(req.file.path);
+    }
+
+    const prod: Product_type = {
+      product_id: parseInt(req.params.id),
+      name: req.body.name,
+      description: req.body.description,
+      img_url: productImage,
+      amount: req.body.amount,
+      category: req.body.category,
+      price: req.body.price,
+    };
+
+    await productRepository.save(prod);
+    res.json({ message: "Product updated successfully" });
+  } catch (err) {
+    res.json({ message: "No such product", error: err });
+  }
+};

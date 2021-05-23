@@ -1,14 +1,20 @@
+import { WebshopUser } from "../entities/WebshopUser";
+import { getRepository } from "typeorm";
 import { res, User } from "types";
 import { MAIL_REGEX } from "../constants";
-import { pool } from "../db";
 
 export const userValidation = async (res: res, User: User) => {
   try {
-    let dbName = await pool.query(
-      `SELECT * FROM "user" WHERE username = '${User.username}'`
-    );
+    const userRepository = getRepository(WebshopUser);
+    const data = await userRepository.find();
 
-    if (dbName.rowCount > 0) {
+    if (data.length === 0) {
+      return true;
+    }
+
+    let dbName = await userRepository.find({ username: User.username });
+
+    if (Object.keys(dbName).length > 0) {
       //console.log("Vec postoji");
       process.env.NODE_ENV == "test"
         ? ""
@@ -40,11 +46,9 @@ export const userValidation = async (res: res, User: User) => {
       return false;
     }
 
-    let dbMail = await pool.query(
-      `SELECT * FROM "user" WHERE email = '${User.email}'`
-    );
+    let dbMail = await userRepository.find({ email: User.email });
 
-    if (dbMail.rowCount > 0) {
+    if (Object.keys(dbMail).length > 0) {
       process.env.NODE_ENV == "test"
         ? ""
         : res.json({

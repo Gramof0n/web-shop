@@ -1,7 +1,9 @@
 import {
   addProduct,
+  deleteProduct,
   getAllProducts,
   getSingleProduct,
+  updateProduct,
 } from "../controllers/products";
 import express from "express";
 import { upload } from "../utils/multer";
@@ -16,5 +18,11 @@ router.get("/products/:id", getSingleProduct);
 
 //add a product
 router.post("/products", upload.single("productImage"), addProduct);
+
+//delete a product
+router.delete("/products/:id", deleteProduct);
+
+//update product
+router.put("/products/:id", upload.single("productImage"), updateProduct);
 
 export default router;

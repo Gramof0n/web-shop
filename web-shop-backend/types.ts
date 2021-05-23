@@ -17,10 +17,11 @@ export type User = {
   password: string;
   email: string;
 };
-export type Product = {
+export type Product_type = {
+  product_id?: number;
   name: string;
   description: string;
-  productImage?: string;
+  img_url?: string;
   amount?: any;
   category: string;
   price?: any;

@@ -3,7 +3,7 @@ process.env.NODE_ENV = "test";
 import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
 import { response } from "express";
-import { Product } from "types";
+import { Product_type } from "types";
 import { productValidation } from "../validation/productValidation";
 
 chai.use(chaiHttp);
@@ -25,12 +25,14 @@ describe("Product endpoints", () => {
     });
   });
   describe("GET one product route", () => {
-    it("should return a product with an ID of 1", (done) => {
+    it("should return a product with an ID of 10", (done) => {
       chai
         .request(url)
-        .get("/products/1")
+        .get("/products/10")
         .end((_, res) => {
-          expect(res.body).to.be.an("object").and.to.include({ product_id: 1 });
+          expect(res.body)
+            .to.be.an("object")
+            .and.to.include({ product_id: 10 });
           done();
         });
     });
@@ -70,7 +72,7 @@ describe("Product endpoints", () => {
 
   describe("Product validation", () => {
     it("should return false if product name already exists", async () => {
-      const Product: Product = {
+      const Product: Product_type = {
         name: "Test",
         description: "Test",
         category: "monitor",
@@ -82,7 +84,7 @@ describe("Product endpoints", () => {
     });
 
     it("should return false if product name is empty ", async () => {
-      const Product: Product = {
+      const Product: Product_type = {
         name: ``,
         description: "Test",
         category: "monitor",
@@ -94,7 +96,7 @@ describe("Product endpoints", () => {
     });
 
     it("should return false if product description is empty ", async () => {
-      const Product: Product = {
+      const Product: Product_type = {
         name: `Test${counter}`,
         description: "",
         category: "monitor",
@@ -106,7 +108,7 @@ describe("Product endpoints", () => {
     });
 
     it("should return false if product category is empty ", async () => {
-      const Product: Product = {
+      const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
         category: "",
@@ -118,7 +120,7 @@ describe("Product endpoints", () => {
     });
 
     it("should return false if product price is empty ", async () => {
-      const Product: Product = {
+      const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
         category: "monitor",
@@ -129,7 +131,7 @@ describe("Product endpoints", () => {
     });
 
     it("should return false if product price is not a number ", async () => {
-      const Product: Product = {
+      const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
         category: "monitor",
@@ -141,7 +143,7 @@ describe("Product endpoints", () => {
     });
 
     it("should return false if product price is negative ", async () => {
-      const Product: Product = {
+      const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
         category: "monitor",
@@ -153,7 +155,7 @@ describe("Product endpoints", () => {
     });
 
     it("should return false if product amount is empty ", async () => {
-      const Product: Product = {
+      const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
         category: "monitor",
@@ -164,7 +166,7 @@ describe("Product endpoints", () => {
     });
 
     it("should return false if product amount is not a number ", async () => {
-      const Product: Product = {
+      const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
         category: "monitor",
@@ -176,7 +178,7 @@ describe("Product endpoints", () => {
     });
 
     it("should return false if product amount is negative ", async () => {
-      const Product: Product = {
+      const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
         category: "monitor",
