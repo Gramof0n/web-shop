@@ -15,7 +15,7 @@ export class Category {
   category_id?: number;
 
   @Column()
-  cateogry_name: string;
+  category_name: string;
 
   @UpdateDateColumn({ nullable: true })
   updated_at?: Date;

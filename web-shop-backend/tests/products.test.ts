@@ -54,7 +54,7 @@ describe("Product endpoints", () => {
         .send({
           name: `test${counter}`,
           description: "test",
-          category: "monitor",
+          category: "monitors",
           amount: 10,
           price: 10,
         })
@@ -73,7 +73,7 @@ describe("Product endpoints", () => {
       const Product: Product_type = {
         name: "Test",
         description: "Test",
-        category: "monitor",
+        category: { category_name: "monitors" },
         amount: 3,
         price: 252,
       };
@@ -85,7 +85,7 @@ describe("Product endpoints", () => {
       const Product: Product_type = {
         name: ``,
         description: "Test",
-        category: "monitor",
+        category: { category_name: "monitors" },
         amount: 3,
         price: 252,
       };
@@ -97,7 +97,7 @@ describe("Product endpoints", () => {
       const Product: Product_type = {
         name: `Test${counter}`,
         description: "",
-        category: "monitor",
+        category: { category_name: "monitors" },
         amount: 3,
         price: 252,
       };
@@ -109,7 +109,7 @@ describe("Product endpoints", () => {
       const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
-        category: "",
+        category: { category_name: "" },
         amount: 3,
         price: 252,
       };
@@ -121,7 +121,7 @@ describe("Product endpoints", () => {
       const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
-        category: "monitor",
+        category: { category_name: "monitors" },
         amount: 3,
       };
 
@@ -132,7 +132,7 @@ describe("Product endpoints", () => {
       const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
-        category: "monitor",
+        category: { category_name: "monitors" },
         amount: 3,
         price: "dad",
       };
@@ -144,7 +144,7 @@ describe("Product endpoints", () => {
       const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
-        category: "monitor",
+        category: { category_name: "monitors" },
         amount: 3,
         price: -1,
       };
@@ -156,7 +156,7 @@ describe("Product endpoints", () => {
       const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
-        category: "monitor",
+        category: { category_name: "monitors" },
         price: 10,
       };
 
@@ -167,7 +167,7 @@ describe("Product endpoints", () => {
       const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
-        category: "monitor",
+        category: { category_name: "monitors" },
         amount: "dasd",
         price: 10,
       };
@@ -179,7 +179,7 @@ describe("Product endpoints", () => {
       const Product: Product_type = {
         name: `Test${counter}`,
         description: "Test",
-        category: "monitor",
+        category: { category_name: "monitors" },
         amount: -3,
         price: 1,
       };

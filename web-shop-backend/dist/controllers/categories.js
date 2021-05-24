@@ -23,7 +23,7 @@ const addCategory = async (req, res) => {
     try {
         const categoryRepository = typeorm_1.getRepository(Category_1.Category);
         const category = {
-            cateogry_name: req.body.name,
+            category_name: req.body.name,
         };
         if (!(await categoryValidation_1.categoryValidation(res, category))) {
             return;

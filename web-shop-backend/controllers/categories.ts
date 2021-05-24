@@ -24,7 +24,7 @@ export const addCategory = async (req: req, res: res) => {
     const categoryRepository = getRepository(Category);
 
     const category: Category = {
-      cateogry_name: req.body.name,
+      category_name: req.body.name,
     };
 
     if (!(await categoryValidation(res, category))) {

@@ -21,7 +21,7 @@ __decorate([
 __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
-], Category.prototype, "cateogry_name", void 0);
+], Category.prototype, "category_name", void 0);
 __decorate([
     typeorm_1.UpdateDateColumn({ nullable: true }),
     __metadata("design:type", Date)

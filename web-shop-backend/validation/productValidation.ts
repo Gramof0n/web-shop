@@ -51,7 +51,7 @@ export const productValidation = async (res: res, Prod: Product_type) => {
     }
 
     //category empty
-    if (!Prod.category) {
+    if (!Prod.category || Prod.category.category_name.length === 0) {
       process.env.NODE_ENV == "test"
         ? ""
         : res.json({

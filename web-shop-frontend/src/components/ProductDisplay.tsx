@@ -35,6 +35,8 @@ export const ProductDisplay: React.FC<ProductDisplayProps> = ({}) => {
       >
         {products &&
           products.map((data, index) => {
+            console.log("KATEGORIJA");
+            console.log(data.category);
             return (
               <Product
                 key={index}
@@ -43,7 +45,7 @@ export const ProductDisplay: React.FC<ProductDisplayProps> = ({}) => {
                 productImage={baseUrl + data.img_url}
                 amount={data.amount}
                 price={data.price}
-                category={data.category}
+                category={data.category.category_name}
               />
             );
           })}

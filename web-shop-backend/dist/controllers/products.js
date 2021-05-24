@@ -53,7 +53,7 @@ const addProduct = async (req, res) => {
             console.log(req.file.path);
         }
         const dbCategory = await categoryRepository.findOne({
-            where: { cateogry_name: req.body.category },
+            where: { category_name: req.body.category },
         });
         if (typeof dbCategory === "undefined") {
             res.json({ error: { field: "category", message: "No such category" } });

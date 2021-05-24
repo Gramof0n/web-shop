@@ -6,7 +6,7 @@ const typeorm_1 = require("typeorm");
 const categoryValidation = async (res, category) => {
     const categoryRepository = typeorm_1.getRepository(Category_1.Category);
     const dbCategory = await categoryRepository.findOne({
-        where: { cateogry_name: category.cateogry_name },
+        where: { category_name: category.category_name },
     });
     if (typeof dbCategory !== "undefined") {
         res.json({

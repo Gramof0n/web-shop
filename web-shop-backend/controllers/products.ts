@@ -58,7 +58,7 @@ export const addProduct = async (req: req, res: res) => {
     }
 
     const dbCategory = await categoryRepository.findOne({
-      where: { cateogry_name: req.body.category },
+      where: { category_name: req.body.category },
     });
 
     if (typeof dbCategory === "undefined") {

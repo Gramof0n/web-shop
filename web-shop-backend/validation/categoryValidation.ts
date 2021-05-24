@@ -5,7 +5,7 @@ import { res } from "types";
 export const categoryValidation = async (res: res, category: Category) => {
   const categoryRepository = getRepository(Category);
   const dbCategory = await categoryRepository.findOne({
-    where: { cateogry_name: category.cateogry_name },
+    where: { category_name: category.category_name },
   });
 
   if (typeof dbCategory !== "undefined") {
