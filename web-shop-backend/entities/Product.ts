@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   VersionColumn,
 } from "typeorm";
+import { Category } from "./Category";
 
 @Entity()
 export class Product {
@@ -24,8 +26,8 @@ export class Product {
   @Column()
   amount: number;
 
-  @Column()
-  category: string;
+  @ManyToOne(() => Category, (category) => category.product)
+  category: Category;
 
   @Column()
   price: number;

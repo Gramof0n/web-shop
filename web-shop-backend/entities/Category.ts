@@ -12,20 +12,20 @@ import { Product } from "./Product";
 @Entity()
 export class Category {
   @PrimaryGeneratedColumn()
-  category_id: number;
+  category_id?: number;
 
   @Column()
   cateogry_name: string;
 
   @UpdateDateColumn({ nullable: true })
-  updated_at: Date;
+  updated_at?: Date;
 
   @CreateDateColumn({ nullable: true })
-  created_at: Date;
+  created_at?: Date;
 
   @VersionColumn()
-  version: number;
+  version?: number;
 
   @OneToMany(() => Product, (product) => product.category, { cascade: true })
-  product: Product[];
+  product?: Product[];
 }

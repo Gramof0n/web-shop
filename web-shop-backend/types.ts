@@ -1,3 +1,4 @@
+import { Category } from "./entities/Category";
 import { Request, Response } from "express";
 import { Session, SessionData } from "express-session";
 
@@ -23,6 +24,6 @@ export type Product_type = {
   description: string;
   img_url?: string;
   amount?: any;
-  category: string;
+  category?: Category;
   price?: any;
 };

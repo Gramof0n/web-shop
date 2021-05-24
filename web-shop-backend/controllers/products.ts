@@ -2,12 +2,13 @@ import { Product } from "../entities/Product";
 import { getRepository } from "typeorm";
 import { Product_type, req, res } from "../types";
 import { productValidation } from "../validation/productValidation";
+import { Category } from "../entities/Category";
 
 //get all
 export const getAllProducts = async (_: req, res: res) => {
   try {
     const productRepository = getRepository(Product);
-    const data = await productRepository.find();
+    const data = await productRepository.find({ relations: ["category"] });
 
     if (data.length > 0) {
       res.json(data);
@@ -25,7 +26,10 @@ export const getSingleProduct = async (req: req, res: res) => {
   try {
     const productRepository = getRepository(Product);
 
-    const data = await productRepository.findOne(req.params.id);
+    const data = await productRepository.findOne({
+      where: { product_id: req.params.id },
+      relations: ["category"],
+    });
 
     if (Object.keys(data!).length > 0) {
       res.json(data);
@@ -44,6 +48,7 @@ export const addProduct = async (req: req, res: res) => {
     let productImage;
 
     const productRepository = getRepository(Product);
+    const categoryRepository = getRepository(Category);
 
     if (!req.file) {
       productImage = `uploads\\default.png`;
@@ -52,12 +57,23 @@ export const addProduct = async (req: req, res: res) => {
       console.log(req.file.path);
     }
 
+    const dbCategory = await categoryRepository.findOne({
+      where: { cateogry_name: req.body.category },
+    });
+
+    if (typeof dbCategory === "undefined") {
+      res.json({ error: { field: "category", message: "No such category" } });
+      return;
+    }
+
+    console.log(dbCategory);
+
     const prod: Product_type = {
       name: req.body.name,
       description: req.body.description,
       img_url: productImage,
       amount: req.body.amount,
-      category: req.body.category,
+      category: dbCategory,
       price: req.body.price,
     };
 

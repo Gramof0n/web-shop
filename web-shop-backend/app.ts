@@ -18,19 +18,22 @@ let redisClient = redis.createClient();
 //ROUTES
 import userRouter from "./routes/users";
 import productRouter from "./routes/products";
+import categoriesRouter from "./routes/categories";
+
 import { createConnection } from "typeorm";
 import { WebshopUser } from "./entities/WebshopUser";
 import { Product } from "./entities/Product";
+import { Category } from "./entities/Category";
 
 const main = async () => {
   await createConnection({
     type: "postgres",
     host: "localhost",
     port: 5432,
-    username: "postgres",
-    password: "postgres",
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     database: "webshop2",
-    entities: [WebshopUser, Product],
+    entities: [WebshopUser, Product, Category],
     migrations: [path.join(__dirname, "./migrations/*")],
   });
   var app = express();
@@ -76,6 +79,9 @@ const main = async () => {
 
   //products route
   app.use("/api/v1", productRouter);
+
+  //categoreis route
+  app.use("/api/v1", categoriesRouter);
 };
 
 main();

@@ -40,7 +40,7 @@ const productValidation = async (res, Prod) => {
                 });
             return false;
         }
-        if (!Prod.category || Prod.category.length === 0) {
+        if (!Prod.category) {
             process.env.NODE_ENV == "test"
                 ? ""
                 : res.json({

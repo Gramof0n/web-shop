@@ -4,10 +4,11 @@ exports.updateProduct = exports.deleteProduct = exports.addProduct = exports.get
 const Product_1 = require("../entities/Product");
 const typeorm_1 = require("typeorm");
 const productValidation_1 = require("../validation/productValidation");
+const Category_1 = require("../entities/Category");
 const getAllProducts = async (_, res) => {
     try {
         const productRepository = typeorm_1.getRepository(Product_1.Product);
-        const data = await productRepository.find();
+        const data = await productRepository.find({ relations: ["category"] });
         if (data.length > 0) {
             res.json(data);
             return;
@@ -22,7 +23,10 @@ exports.getAllProducts = getAllProducts;
 const getSingleProduct = async (req, res) => {
     try {
         const productRepository = typeorm_1.getRepository(Product_1.Product);
-        const data = await productRepository.findOne(req.params.id);
+        const data = await productRepository.findOne({
+            where: { product_id: req.params.id },
+            relations: ["category"],
+        });
         if (Object.keys(data).length > 0) {
             res.json(data);
             return;
@@ -40,6 +44,7 @@ const addProduct = async (req, res) => {
     try {
         let productImage;
         const productRepository = typeorm_1.getRepository(Product_1.Product);
+        const categoryRepository = typeorm_1.getRepository(Category_1.Category);
         if (!req.file) {
             productImage = `uploads\\default.png`;
         }
@@ -47,12 +52,20 @@ const addProduct = async (req, res) => {
             productImage = req.file.path;
             console.log(req.file.path);
         }
+        const dbCategory = await categoryRepository.findOne({
+            where: { cateogry_name: req.body.category },
+        });
+        if (typeof dbCategory === "undefined") {
+            res.json({ error: { field: "category", message: "No such category" } });
+            return;
+        }
+        console.log(dbCategory);
         const prod = {
             name: req.body.name,
             description: req.body.description,
             img_url: productImage,
             amount: req.body.amount,
-            category: req.body.category,
+            category: dbCategory,
             price: req.body.price,
         };
         if (!(await productValidation_1.productValidation(res, prod)))

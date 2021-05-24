@@ -5,6 +5,7 @@ import { Product_type, res } from "../types";
 export const productValidation = async (res: res, Prod: Product_type) => {
   try {
     const productRepository = getRepository(Product);
+
     const data = await productRepository.find();
 
     if (data.length === 0) {
@@ -50,7 +51,7 @@ export const productValidation = async (res: res, Prod: Product_type) => {
     }
 
     //category empty
-    if (!Prod.category || Prod.category.length === 0) {
+    if (!Prod.category) {
       process.env.NODE_ENV == "test"
         ? ""
         : res.json({
