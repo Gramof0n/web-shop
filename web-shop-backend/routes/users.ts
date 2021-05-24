@@ -9,6 +9,7 @@ import {
   registerUser,
   toggleAdminStatus,
   toggleUser,
+  updateUser,
 } from "../controllers/users";
 
 const router = express.Router();
@@ -39,5 +40,8 @@ router.get("/users/promote/:id", toggleAdminStatus);
 
 //get user session
 router.get("/user/me", me);
+
+//edit user
+router.put("/users/:id", updateUser);
 
 export default router;

@@ -29,7 +29,7 @@ const main = async () => {
     port: 5432,
     username: "postgres",
     password: "postgres",
-    database: "webshop",
+    database: "webshop2",
     entities: [WebshopUser, Product],
     migrations: [path.join(__dirname, "./migrations/*")],
   });

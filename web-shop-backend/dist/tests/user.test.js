@@ -30,7 +30,9 @@ describe("User endpoints", () => {
                 .request(url)
                 .get("/users/1")
                 .end((_, res) => {
-                expect(res.body).to.be.an("object").and.to.include({ user_id: 1 });
+                expect(res.body)
+                    .to.be.an("object")
+                    .and.to.include({ webshop_user_id: 1 });
                 done();
             });
         });

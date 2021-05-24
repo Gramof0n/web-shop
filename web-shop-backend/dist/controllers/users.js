@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.me = exports.logoutUser = exports.toggleAdminStatus = exports.toggleUser = exports.deleteAUser = exports.getOneUser = exports.loginUser = exports.registerUser = exports.getUsers = void 0;
+exports.me = exports.logoutUser = exports.toggleAdminStatus = exports.toggleUser = exports.updateUser = exports.deleteAUser = exports.getOneUser = exports.loginUser = exports.registerUser = exports.getUsers = void 0;
 const argon2_1 = __importDefault(require("argon2"));
 const userValidation_1 = require("../validation/userValidation");
 const typeorm_1 = require("typeorm");
@@ -78,8 +78,10 @@ const getOneUser = async (req, res) => {
     try {
         const userRepository = typeorm_1.getRepository(WebshopUser_1.WebshopUser);
         const data = await userRepository.findOne({
-            webshop_user_id: parseInt(req.params.id),
-            is_deleted: false,
+            where: {
+                webshop_user_id: parseInt(req.params.id),
+                is_deleted: false,
+            },
         });
         typeof data !== "undefined"
             ? res.json(data)
@@ -93,7 +95,16 @@ exports.getOneUser = getOneUser;
 const deleteAUser = async (req, res) => {
     try {
         const userRepository = typeorm_1.getRepository(WebshopUser_1.WebshopUser);
-        await userRepository.delete({ webshop_user_id: parseInt(req.params.id) });
+        const user = await userRepository.findOne({
+            where: {
+                webshop_user_id: parseInt(req.params.id),
+            },
+            lock: {
+                mode: "optimistic",
+                version: 1,
+            },
+        });
+        await userRepository.delete(user.webshop_user_id);
         res.json({ message: "User successfully deleted" });
     }
     catch (err) {
@@ -101,6 +112,29 @@ const deleteAUser = async (req, res) => {
     }
 };
 exports.deleteAUser = deleteAUser;
+const updateUser = async (req, res) => {
+    try {
+        const userRepository = typeorm_1.getRepository(WebshopUser_1.WebshopUser);
+        const dbUser = await typeorm_1.getRepository(WebshopUser_1.WebshopUser)
+            .createQueryBuilder("webshop_user")
+            .setLock("pessimistic_write")
+            .useTransaction(true)
+            .where(`webshop_user_id=:id`, { id: req.params.id })
+            .getOne();
+        (dbUser.name = req.body.name),
+            (dbUser.surname = req.body.surname),
+            (dbUser.username = req.body.username),
+            (dbUser.email = req.body.email),
+            (dbUser.password = req.body.password),
+            console.log(dbUser);
+        await userRepository.save(dbUser);
+        res.json({ message: "User successfully updated" });
+    }
+    catch (err) {
+        res.json({ message: "No such user", error: err });
+    }
+};
+exports.updateUser = updateUser;
 const toggleUser = async (req, res) => {
     const userRepository = typeorm_1.getRepository(WebshopUser_1.WebshopUser);
     if (req.session.isAdmin !== true) {
@@ -108,9 +142,12 @@ const toggleUser = async (req, res) => {
         return;
     }
     console.log(req.session.isAdmin);
-    const user = await userRepository.findOne({
-        webshop_user_id: parseInt(req.params.id),
-    });
+    const user = await typeorm_1.getRepository(WebshopUser_1.WebshopUser)
+        .createQueryBuilder("webshop_user")
+        .setLock("pessimistic_write")
+        .useTransaction(true)
+        .where(`webshop_user_id=:id`, { id: req.params.id })
+        .getOne();
     if (user === null || user === void 0 ? void 0 : user.is_deleted) {
         user.is_deleted = false;
         await userRepository.save(user);
@@ -131,19 +168,22 @@ const toggleAdminStatus = async (req, res) => {
         res.json({ message: "Unauthorized" });
         return;
     }
-    const user = await userRepository.findOne({
-        webshop_user_id: parseInt(req.params.id),
-    });
+    const user = await typeorm_1.getRepository(WebshopUser_1.WebshopUser)
+        .createQueryBuilder("webshop_user")
+        .setLock("pessimistic_write")
+        .useTransaction(true)
+        .where(`webshop_user_id=:id`, { id: req.params.id })
+        .getOne();
     if (user === null || user === void 0 ? void 0 : user.is_admin) {
         user.is_admin = false;
         await userRepository.save(user);
-        res.json({ message: "Admin status removed" });
+        res.json({ message: "Admin status successfully removed" });
         return;
     }
     else {
         user.is_admin = true;
         await userRepository.save(user);
-        res.json({ message: "Admin status granted" });
+        res.json({ message: "Admin status successfully set" });
         return;
     }
 };

@@ -1,4 +1,3 @@
-import { pool } from "../db";
 import argon2 from "argon2";
 import { userValidation } from "../validation/userValidation";
 import { req, res, User } from "types";
@@ -88,8 +87,10 @@ export const getOneUser = async (req: req, res: res) => {
   try {
     const userRepository = getRepository(WebshopUser);
     const data = await userRepository.findOne({
-      webshop_user_id: parseInt(req.params.id),
-      is_deleted: false,
+      where: {
+        webshop_user_id: parseInt(req.params.id),
+        is_deleted: false,
+      },
     });
     typeof data !== "undefined"
       ? res.json(data)
@@ -102,8 +103,43 @@ export const getOneUser = async (req: req, res: res) => {
 export const deleteAUser = async (req: req, res: res) => {
   try {
     const userRepository = getRepository(WebshopUser);
-    await userRepository.delete({ webshop_user_id: parseInt(req.params.id) });
+    const user = await userRepository.findOne({
+      where: {
+        webshop_user_id: parseInt(req.params.id),
+      },
+      lock: {
+        mode: "optimistic",
+        version: 1,
+      },
+    });
+    await userRepository.delete(user!.webshop_user_id);
     res.json({ message: "User successfully deleted" });
+  } catch (err) {
+    res.json({ message: "No such user", error: err });
+  }
+};
+
+export const updateUser = async (req: req, res: res) => {
+  try {
+    const userRepository = getRepository(WebshopUser);
+
+    const dbUser = await getRepository(WebshopUser)
+      .createQueryBuilder("webshop_user")
+      .setLock("pessimistic_write")
+      .useTransaction(true)
+      .where(`webshop_user_id=:id`, { id: req.params.id })
+      .getOne();
+
+    (dbUser!.name = req.body.name),
+      (dbUser!.surname = req.body.surname),
+      (dbUser!.username = req.body.username),
+      (dbUser!.email = req.body.email),
+      (dbUser!.password = req.body.password),
+      console.log(dbUser);
+
+    await userRepository.save(dbUser!);
+
+    res.json({ message: "User successfully updated" });
   } catch (err) {
     res.json({ message: "No such user", error: err });
   }
@@ -119,9 +155,12 @@ export const toggleUser = async (req: req, res: res) => {
 
   console.log(req.session.isAdmin);
 
-  const user = await userRepository.findOne({
-    webshop_user_id: parseInt(req.params.id),
-  });
+  const user = await getRepository(WebshopUser)
+    .createQueryBuilder("webshop_user")
+    .setLock("pessimistic_write")
+    .useTransaction(true)
+    .where(`webshop_user_id=:id`, { id: req.params.id })
+    .getOne();
 
   if (user?.is_deleted) {
     user.is_deleted = false;
@@ -144,19 +183,22 @@ export const toggleAdminStatus = async (req: req, res: res) => {
     return;
   }
 
-  const user = await userRepository.findOne({
-    webshop_user_id: parseInt(req.params.id),
-  });
+  const user = await getRepository(WebshopUser)
+    .createQueryBuilder("webshop_user")
+    .setLock("pessimistic_write")
+    .useTransaction(true)
+    .where(`webshop_user_id=:id`, { id: req.params.id })
+    .getOne();
 
   if (user?.is_admin) {
     user.is_admin = false;
     await userRepository.save(user);
-    res.json({ message: "Admin status removed" });
+    res.json({ message: "Admin status successfully removed" });
     return;
   } else {
     user!.is_admin = true;
     await userRepository.save(user!);
-    res.json({ message: "Admin status granted" });
+    res.json({ message: "Admin status successfully set" });
     return;
   }
 };

@@ -14,6 +14,7 @@ const productValidation = async (res, Prod) => {
             name: Prod.name,
             category: Prod.category,
         });
+        console.log(dbProduct);
         if (Object.keys(dbProduct).length > 0) {
             process.env.NODE_ENV == "test"
                 ? ""
@@ -116,7 +117,6 @@ const productValidation = async (res, Prod) => {
         return true;
     }
     catch (err) {
-        res.json({ error: err });
         return false;
     }
 };

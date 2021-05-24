@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  VersionColumn,
+} from "typeorm";
 
 @Entity()
 export class WebshopUser {
@@ -25,4 +32,13 @@ export class WebshopUser {
 
   @Column({ default: false })
   is_deleted: boolean;
+
+  @UpdateDateColumn({ nullable: true })
+  updated_at: Date;
+
+  @CreateDateColumn({ nullable: true })
+  created_at: Date;
+
+  @VersionColumn()
+  version: number;
 }

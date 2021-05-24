@@ -43,14 +43,12 @@ describe("Product endpoints", () => {
         });
     });
     describe("GET one product route", () => {
-        it("should return a product with an ID of 10", (done) => {
+        it("should return a product with an ID of 1", (done) => {
             chai_1.default
                 .request(url)
-                .get("/products/10")
+                .get("/products/1")
                 .end((_, res) => {
-                chai_1.expect(res.body)
-                    .to.be.an("object")
-                    .and.to.include({ product_id: 10 });
+                chai_1.expect(res.body).to.be.an("object").and.to.include({ product_id: 1 });
                 done();
             });
         });

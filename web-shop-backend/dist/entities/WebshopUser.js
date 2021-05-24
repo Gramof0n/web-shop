@@ -45,6 +45,18 @@ __decorate([
     typeorm_1.Column({ default: false }),
     __metadata("design:type", Boolean)
 ], WebshopUser.prototype, "is_deleted", void 0);
+__decorate([
+    typeorm_1.UpdateDateColumn({ nullable: true }),
+    __metadata("design:type", Date)
+], WebshopUser.prototype, "updated_at", void 0);
+__decorate([
+    typeorm_1.CreateDateColumn({ nullable: true }),
+    __metadata("design:type", Date)
+], WebshopUser.prototype, "created_at", void 0);
+__decorate([
+    typeorm_1.VersionColumn(),
+    __metadata("design:type", Number)
+], WebshopUser.prototype, "version", void 0);
 WebshopUser = __decorate([
     typeorm_1.Entity()
 ], WebshopUser);

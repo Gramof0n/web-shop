@@ -2,33 +2,20 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   VersionColumn,
 } from "typeorm";
+import { Product } from "./Product";
 
 @Entity()
-export class Product {
+export class Category {
   @PrimaryGeneratedColumn()
-  product_id: number;
+  category_id: number;
 
   @Column()
-  name: string;
-
-  @Column()
-  description: string;
-
-  @Column()
-  img_url: string;
-
-  @Column()
-  amount: number;
-
-  @Column()
-  category: string;
-
-  @Column()
-  price: number;
+  cateogry_name: string;
 
   @UpdateDateColumn({ nullable: true })
   updated_at: Date;
@@ -38,4 +25,7 @@ export class Product {
 
   @VersionColumn()
   version: number;
+
+  @OneToMany(() => Product, (product) => product.category, { cascade: true })
+  product: Product[];
 }

@@ -15,5 +15,6 @@ router.delete("/users/:id", users_1.deleteAUser);
 router.get("/users/deactivate/:id", users_1.toggleUser);
 router.get("/users/promote/:id", users_1.toggleAdminStatus);
 router.get("/user/me", users_1.me);
+router.put("/users/:id", users_1.updateUser);
 exports.default = router;
 //# sourceMappingURL=users.js.map

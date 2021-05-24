@@ -16,6 +16,7 @@ export const productValidation = async (res: res, Prod: Product_type) => {
       category: Prod.category,
     });
 
+    console.log(dbProduct);
     //already exists
     if (Object.keys(dbProduct).length > 0) {
       process.env.NODE_ENV == "test"
@@ -127,7 +128,6 @@ export const productValidation = async (res: res, Prod: Product_type) => {
     //all good
     return true;
   } catch (err) {
-    res.json({ error: err });
     return false;
   }
 };

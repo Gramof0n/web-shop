@@ -9,52 +9,37 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Product = void 0;
+exports.Category = void 0;
 const typeorm_1 = require("typeorm");
-let Product = class Product {
+const Product_1 = require("./Product");
+let Category = class Category {
 };
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], Product.prototype, "product_id", void 0);
+], Category.prototype, "category_id", void 0);
 __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
-], Product.prototype, "name", void 0);
-__decorate([
-    typeorm_1.Column(),
-    __metadata("design:type", String)
-], Product.prototype, "description", void 0);
-__decorate([
-    typeorm_1.Column(),
-    __metadata("design:type", String)
-], Product.prototype, "img_url", void 0);
-__decorate([
-    typeorm_1.Column(),
-    __metadata("design:type", Number)
-], Product.prototype, "amount", void 0);
-__decorate([
-    typeorm_1.Column(),
-    __metadata("design:type", String)
-], Product.prototype, "category", void 0);
-__decorate([
-    typeorm_1.Column(),
-    __metadata("design:type", Number)
-], Product.prototype, "price", void 0);
+], Category.prototype, "cateogry_name", void 0);
 __decorate([
     typeorm_1.UpdateDateColumn({ nullable: true }),
     __metadata("design:type", Date)
-], Product.prototype, "updated_at", void 0);
+], Category.prototype, "updated_at", void 0);
 __decorate([
     typeorm_1.CreateDateColumn({ nullable: true }),
     __metadata("design:type", Date)
-], Product.prototype, "created_at", void 0);
+], Category.prototype, "created_at", void 0);
 __decorate([
     typeorm_1.VersionColumn(),
     __metadata("design:type", Number)
-], Product.prototype, "version", void 0);
-Product = __decorate([
+], Category.prototype, "version", void 0);
+__decorate([
+    typeorm_1.OneToMany(() => Product_1.Product, (product) => product.category, { cascade: true }),
+    __metadata("design:type", Array)
+], Category.prototype, "product", void 0);
+Category = __decorate([
     typeorm_1.Entity()
-], Product);
-exports.Product = Product;
-//# sourceMappingURL=Product.js.map
+], Category);
+exports.Category = Category;
+//# sourceMappingURL=Category.js.map
