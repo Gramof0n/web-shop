@@ -106,6 +106,18 @@ export const updateProduct = async (req: req, res: res) => {
     let productImage;
 
     const productRepository = getRepository(Product);
+    const categoryRepository = getRepository(Category);
+
+    const dbCategory = await categoryRepository.findOne({
+      where: { category_name: req.body.category },
+    });
+
+    if (typeof dbCategory === "undefined") {
+      res.json({
+        error: { field: "category", message: "No such category" },
+      });
+      return;
+    }
 
     if (!req.file) {
       productImage = `uploads\\default.png`;
@@ -120,7 +132,7 @@ export const updateProduct = async (req: req, res: res) => {
       description: req.body.description,
       img_url: productImage,
       amount: req.body.amount,
-      category: req.body.category,
+      category: dbCategory,
       price: req.body.price,
     };
 
@@ -128,5 +140,40 @@ export const updateProduct = async (req: req, res: res) => {
     res.json({ message: "Product updated successfully" });
   } catch (err) {
     res.json({ message: "No such product", error: err });
+  }
+};
+
+//get by category
+export const getProductByCategory = async (req: req, res: res) => {
+  try {
+    const productRepository = getRepository(Product);
+    const categoryRepository = getRepository(Category);
+
+    const dbCategory = await categoryRepository.findOne({
+      where: { category_name: req.params.category },
+    });
+
+    if (typeof dbCategory === "undefined") {
+      res.json({
+        error: { field: "category", message: "No such category" },
+      });
+      return;
+    }
+
+    const product = await productRepository.find({
+      where: { category: dbCategory },
+      relations: ["category"],
+    });
+
+    if (product.length === 0) {
+      res.json({
+        error: { field: "category", message: "No products for this category" },
+      });
+      return;
+    }
+
+    res.json(product);
+  } catch (err) {
+    res.json({ error: err });
   }
 };

@@ -1,21 +1,25 @@
-import { Box, Grid } from "@chakra-ui/layout";
+import { Grid } from "@chakra-ui/layout";
 import { Flex } from "@chakra-ui/react";
-import axios from "axios";
 import React, { useState } from "react";
 import { useEffect } from "react";
+import { Error_type, Product_type } from "../types";
 import { getProducts } from "../utils/getProducts";
 import { Product } from "./Product";
-import Wrapper from "./Wrapper";
 
-interface ProductDisplayProps {}
+interface ProductDisplayProps {
+  category?: string | string[];
+}
 
-export const ProductDisplay: React.FC<ProductDisplayProps> = ({}) => {
+export const ProductDisplay: React.FC<ProductDisplayProps> = ({ category }) => {
   const baseUrl = "http://localhost:4000/";
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Array<Product_type>>([]);
+  const [errors, setErrors] = useState<Error_type>(null);
 
   useEffect(() => {
-    getProducts(setProducts);
-  }, []);
+    setErrors(null);
+    console.log("Kategorija iz product displaya: " + category);
+    getProducts(setProducts, setErrors, category);
+  }, [category]);
 
   return (
     <Flex
@@ -26,17 +30,22 @@ export const ProductDisplay: React.FC<ProductDisplayProps> = ({}) => {
       backgroundColor="#f5f5f5"
     >
       <Grid
-        templateColumns="repeat(5,2fr)"
+        templateColumns={{
+          lg: "repeat(4,2fr)",
+          md: "repeat(2,2fr)",
+          sm: "repeat(1,2fr)",
+          "2xl": "repeat(5,2fr)",
+        }}
         gap="5"
         boxShadow="2xl"
         m="0"
         p="10"
-        minW="1500px"
+        maxW={{ sm: "100%", md: "100%", lg: "100%", "2xl": "70%" }}
       >
-        {products &&
+        {errors !== null ? (
+          <Flex>{errors.message}</Flex>
+        ) : (
           products.map((data, index) => {
-            console.log("KATEGORIJA");
-            console.log(data.category);
             return (
               <Product
                 key={index}
@@ -48,7 +57,8 @@ export const ProductDisplay: React.FC<ProductDisplayProps> = ({}) => {
                 category={data.category.category_name}
               />
             );
-          })}
+          })
+        )}
       </Grid>
     </Flex>
   );

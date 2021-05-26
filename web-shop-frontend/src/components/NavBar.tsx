@@ -1,4 +1,18 @@
-import { Flex, Box, Link, Button, Image, Heading } from "@chakra-ui/react";
+import {
+  Flex,
+  Box,
+  Link,
+  Button,
+  Image,
+  Heading,
+  Grid,
+  PopoverTrigger,
+  Popover,
+  Portal,
+  PopoverContent,
+  PopoverBody,
+  PopoverHeader,
+} from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import NextLink from "next/link";
 import { getUser } from "../utils/getUser";
@@ -6,6 +20,7 @@ import axios from "axios";
 
 import img from "../img/placeholder.png";
 import SearchBar from "./SearchBar";
+import * as FontAwesome from "react-icons/fa";
 
 interface NavBarProps {}
 
@@ -39,7 +54,7 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
   if (Object.keys(user).length === 0) {
     //noone logged in
     body = (
-      <Box ml="auto">
+      <Box fontSize={{ "2xl": "lg", lg: "lg", md: "md", sm: "sm" }}>
         <NextLink href="/login">
           <Link mr={4} color="white">
             Login
@@ -55,32 +70,70 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
     //user logged in
     body = (
       <>
-        <Box mr={4} color="white">
-          Welcome {user.username}
-        </Box>
         <Box>
           <Button
+            textAlign="center"
             variant="link"
             color="white"
-            onClick={async () => {
-              await logout();
-            }}
+            onClick={() => {}}
+            fontSize={{ "2xl": "lg", lg: "lg", md: "md", sm: "sm" }}
           >
-            Logout
+            Cart
+            <FontAwesome.FaShoppingCart
+              color="white"
+              style={{ marginRight: 15, marginLeft: 5 }}
+            />
           </Button>
         </Box>
+
+        <Popover placement="bottom-start">
+          <PopoverTrigger>
+            <Button
+              variant="link"
+              textAlign="center"
+              color="white"
+              fontSize={{ "2xl": "lg", lg: "lg", md: "md", sm: "sm" }}
+            >
+              Profile{" "}
+              <FontAwesome.FaUserAlt color="white" style={{ marginLeft: 5 }} />
+            </Button>
+          </PopoverTrigger>
+
+          <Portal>
+            <PopoverContent>
+              <PopoverHeader>Welcome {user.username}</PopoverHeader>
+              <PopoverBody>
+                <Button
+                  textAlign="center"
+                  variant="link"
+                  color="black"
+                  onClick={async () => {
+                    await logout();
+                  }}
+                >
+                  Logout{" "}
+                  <FontAwesome.FaSignOutAlt
+                    style={{ marginLeft: 5 }}
+                    color="black"
+                    size={20}
+                  />
+                </Button>
+              </PopoverBody>
+            </PopoverContent>
+          </Portal>
+        </Popover>
       </>
     );
   } else {
     //admin logged in
     body = (
       <>
-        <Box mr={4} color="white">
+        <Box mr={10} color="white">
           Welcome admin {user.username}
         </Box>
         <Box>
           <NextLink href="/admin-panel">
-            <Link mr={4} color="white">
+            <Link mr={10} color="white">
               Admin panel
             </Link>
           </NextLink>
@@ -101,23 +154,37 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
   }
 
   return (
-    <Flex background="blackAlpha.800" p={5} w="100%">
-      {/* Image and title */}
-      <Flex alignItems="center">
-        <Image src={img} maxW="60px" />
-        <Heading variant="h4" ml={4} color="white">
-          TECHOTON
-        </Heading>
-      </Flex>
+    <Flex background="blackAlpha.800" p={5} flex={1} justifyContent="center">
+      <Flex minW="70%">
+        <Grid width="100%" templateColumns="repeat(3, 1fr)">
+          {/* Image and title */}
+          <Flex alignContent="center">
+            <NextLink href="/">
+              <Image src={img} maxW="60px" cursor="pointer" />
+            </NextLink>
+            <NextLink href="/">
+              <Heading
+                variant="h4"
+                ml={4}
+                color="white"
+                display={{ sm: "none", md: "initial" }}
+                cursor="pointer"
+              >
+                TECHOTON
+              </Heading>
+            </NextLink>
+          </Flex>
 
-      {/* Search bar */}
-      <Flex alignItems="center" w="100%" justifyContent="center">
-        <SearchBar />
-      </Flex>
+          {/* Search bar */}
+          <Flex alignItems="center">
+            <SearchBar />
+          </Flex>
 
-      {/* Login and register */}
-      <Flex ml="auto" alignItems="center">
-        {body}
+          {/* Login and register */}
+          <Flex alignItems="center" justifyContent="flex-end" ml={3}>
+            {body}
+          </Flex>
+        </Grid>
       </Flex>
     </Flex>
   );

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateProduct = exports.deleteProduct = exports.addProduct = exports.getSingleProduct = exports.getAllProducts = void 0;
+exports.getProductByCategory = exports.updateProduct = exports.deleteProduct = exports.addProduct = exports.getSingleProduct = exports.getAllProducts = void 0;
 const Product_1 = require("../entities/Product");
 const typeorm_1 = require("typeorm");
 const productValidation_1 = require("../validation/productValidation");
@@ -93,6 +93,16 @@ const updateProduct = async (req, res) => {
     try {
         let productImage;
         const productRepository = typeorm_1.getRepository(Product_1.Product);
+        const categoryRepository = typeorm_1.getRepository(Category_1.Category);
+        const dbCategory = await categoryRepository.findOne({
+            where: { category_name: req.body.category },
+        });
+        if (typeof dbCategory === "undefined") {
+            res.json({
+                error: { field: "category", message: "No such category" },
+            });
+            return;
+        }
         if (!req.file) {
             productImage = `uploads\\default.png`;
         }
@@ -106,7 +116,7 @@ const updateProduct = async (req, res) => {
             description: req.body.description,
             img_url: productImage,
             amount: req.body.amount,
-            category: req.body.category,
+            category: dbCategory,
             price: req.body.price,
         };
         await productRepository.save(prod);
@@ -117,4 +127,34 @@ const updateProduct = async (req, res) => {
     }
 };
 exports.updateProduct = updateProduct;
+const getProductByCategory = async (req, res) => {
+    try {
+        const productRepository = typeorm_1.getRepository(Product_1.Product);
+        const categoryRepository = typeorm_1.getRepository(Category_1.Category);
+        const dbCategory = await categoryRepository.findOne({
+            where: { category_name: req.params.category },
+        });
+        if (typeof dbCategory === "undefined") {
+            res.json({
+                error: { field: "category", message: "No such category" },
+            });
+            return;
+        }
+        const product = await productRepository.find({
+            where: { category: dbCategory },
+            relations: ["category"],
+        });
+        if (product.length === 0) {
+            res.json({
+                error: { field: "category", message: "No products for this category" },
+            });
+            return;
+        }
+        res.json(product);
+    }
+    catch (err) {
+        res.json({ error: err });
+    }
+};
+exports.getProductByCategory = getProductByCategory;
 //# sourceMappingURL=products.js.map

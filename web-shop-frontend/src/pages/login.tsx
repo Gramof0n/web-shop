@@ -5,12 +5,14 @@ import { useRouter } from "next/router";
 import React from "react";
 import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";
+import { ApiCalls } from "../utils/apiCalls";
 import { mapError } from "../utils/mapError";
 
 interface loginProps {}
 
 const login: React.FC<loginProps> = ({}) => {
   const router = useRouter();
+  const api = ApiCalls.getInstance();
   axios.defaults.withCredentials = true;
 
   return (
@@ -22,13 +24,10 @@ const login: React.FC<loginProps> = ({}) => {
             password: "",
           }}
           onSubmit={async (values, { setErrors }) => {
-            const response = await axios.post(
-              "http://localhost:4000/api/v1/users/login",
-              {
-                username: values.username,
-                password: values.password,
-              }
-            );
+            const response = await api.post("/users/login", {
+              username: values.username,
+              password: values.password,
+            });
 
             if (response.data?.error) {
               setErrors(mapError(response.data.error));

@@ -12,9 +12,9 @@ interface SearchBarProps {}
 export const SearchBar: React.FC<SearchBarProps> = ({}) => {
   return (
     <>
-      <InputGroup w="50%" minW="500px">
+      <InputGroup minW={{ sm: "250px", lg: "450px", md: "300px" }}>
         <Input type="text" color="white" />
-        <InputRightAddon m={0} p={0} w={20}>
+        <InputRightAddon m={0} p={0} w={10}>
           <IconButton
             aria-label="search-products"
             icon={<SearchIcon />}

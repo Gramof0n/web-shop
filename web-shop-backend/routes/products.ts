@@ -2,6 +2,7 @@ import {
   addProduct,
   deleteProduct,
   getAllProducts,
+  getProductByCategory,
   getSingleProduct,
   updateProduct,
 } from "../controllers/products";
@@ -24,5 +25,8 @@ router.delete("/products/:id", deleteProduct);
 
 //update product
 router.put("/products/:id", upload.single("productImage"), updateProduct);
+
+//get by category
+router.get("/products/category/:category", getProductByCategory);
 
 export default router;
