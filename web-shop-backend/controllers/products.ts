@@ -8,7 +8,9 @@ import { Category } from "../entities/Category";
 export const getAllProducts = async (_: req, res: res) => {
   try {
     const productRepository = getRepository(Product);
-    const data = await productRepository.find({ relations: ["category"] });
+    const data = await productRepository.find({
+      relations: ["category", "carts"],
+    });
 
     if (data.length > 0) {
       res.json(data);
@@ -28,7 +30,7 @@ export const getSingleProduct = async (req: req, res: res) => {
 
     const data = await productRepository.findOne({
       where: { product_id: req.params.id },
-      relations: ["category"],
+      relations: ["category", "carts"],
     });
 
     if (Object.keys(data!).length > 0) {
@@ -175,5 +177,35 @@ export const getProductByCategory = async (req: req, res: res) => {
     res.json(product);
   } catch (err) {
     res.json({ error: err });
+  }
+};
+
+//decrement amount (call on purchase)
+export const purchaseProduct = async (req: req, res: res) => {
+  try {
+    const productRepository = getRepository(Product);
+    const dbProduct = await productRepository
+      .createQueryBuilder("product")
+      .setLock("pessimistic_write")
+      .useTransaction(true)
+      .where("product_id=:id", { id: req.params.id })
+      .getOne();
+
+    dbProduct!.amount -= 1;
+
+    await productRepository.save(dbProduct!);
+
+    res.json({
+      message: "Transaction complete, item purchased",
+      product: dbProduct,
+    });
+  } catch (err) {
+    res.json({
+      error: {
+        field: "",
+        message: "Something went wrong, try again later",
+        error: err,
+      },
+    });
   }
 };

@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   VersionColumn,
 } from "typeorm";
+import { Cart } from "./Cart";
 
 @Entity()
 export class WebshopUser {
@@ -32,6 +34,9 @@ export class WebshopUser {
 
   @Column({ default: false })
   is_deleted: boolean;
+
+  @OneToOne(() => Cart, (cart) => cart.user)
+  cart: Cart;
 
   @UpdateDateColumn({ nullable: true })
   updated_at: Date;

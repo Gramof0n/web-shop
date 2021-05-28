@@ -3,10 +3,11 @@ import { userValidation } from "../validation/userValidation";
 import { req, res, User } from "types";
 import { getRepository } from "typeorm";
 import { WebshopUser } from "../entities/WebshopUser";
+import { Cart } from "../entities/Cart";
 
 export const getUsers = async (_: any, res: res) => {
   const userRepository = getRepository(WebshopUser);
-  const data = await userRepository.find();
+  const data = await userRepository.find({ relations: ["cart"] });
 
   if (data.length > 0) {
     res.json(data);
@@ -18,6 +19,8 @@ export const getUsers = async (_: any, res: res) => {
 export const registerUser = async (req: req, res: res) => {
   try {
     const userRepository = getRepository(WebshopUser);
+    const cartRepository = getRepository(Cart);
+    const cart = new Cart();
 
     const User: User = {
       name: req.body.name,
@@ -25,11 +28,14 @@ export const registerUser = async (req: req, res: res) => {
       username: req.body.username,
       password: req.body.password,
       email: req.body.email,
+      cart,
     };
 
     if (!(await userValidation(res, User))) {
       return;
     }
+
+    await cartRepository.save(cart);
 
     const hashedPassword = await argon2.hash(User.password);
 
@@ -37,7 +43,10 @@ export const registerUser = async (req: req, res: res) => {
 
     await userRepository.save(User);
 
-    const dbUser = await userRepository.findOne({ username: User.username });
+    const dbUser = await userRepository.findOne(
+      { username: User.username },
+      { relations: ["cart"] }
+    );
 
     req.session.userId = dbUser?.webshop_user_id;
     req.session.isAdmin = dbUser?.is_admin;
@@ -91,6 +100,7 @@ export const getOneUser = async (req: req, res: res) => {
         webshop_user_id: parseInt(req.params.id),
         is_deleted: false,
       },
+      relations: ["cart"],
     });
     typeof data !== "undefined"
       ? res.json(data)

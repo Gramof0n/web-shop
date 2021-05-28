@@ -2,11 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   VersionColumn,
 } from "typeorm";
+import { Cart } from "./Cart";
 import { Category } from "./Category";
 
 @Entity()
@@ -28,6 +30,9 @@ export class Product {
 
   @ManyToOne(() => Category, (category) => category.product)
   category: Category;
+
+  @ManyToMany(() => Cart, (cart) => cart.products, { nullable: true })
+  carts: Cart[];
 
   @Column()
   price: number;

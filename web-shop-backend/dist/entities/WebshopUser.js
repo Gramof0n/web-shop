@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebshopUser = void 0;
 const typeorm_1 = require("typeorm");
+const Cart_1 = require("./Cart");
 let WebshopUser = class WebshopUser {
 };
 __decorate([
@@ -45,6 +46,10 @@ __decorate([
     typeorm_1.Column({ default: false }),
     __metadata("design:type", Boolean)
 ], WebshopUser.prototype, "is_deleted", void 0);
+__decorate([
+    typeorm_1.OneToOne(() => Cart_1.Cart, (cart) => cart.user),
+    __metadata("design:type", Cart_1.Cart)
+], WebshopUser.prototype, "cart", void 0);
 __decorate([
     typeorm_1.UpdateDateColumn({ nullable: true }),
     __metadata("design:type", Date)

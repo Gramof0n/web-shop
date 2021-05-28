@@ -19,11 +19,13 @@ let redisClient = redis.createClient();
 import userRouter from "./routes/users";
 import productRouter from "./routes/products";
 import categoriesRouter from "./routes/categories";
+import cartRouter from "./routes/cart";
 
 import { createConnection } from "typeorm";
 import { WebshopUser } from "./entities/WebshopUser";
 import { Product } from "./entities/Product";
 import { Category } from "./entities/Category";
+import { Cart } from "./entities/Cart";
 
 const main = async () => {
   await createConnection({
@@ -33,7 +35,7 @@ const main = async () => {
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: "webshop2",
-    entities: [WebshopUser, Product, Category],
+    entities: [WebshopUser, Product, Category, Cart],
     migrations: [path.join(__dirname, "./migrations/*")],
   });
   var app = express();
@@ -43,8 +45,6 @@ const main = async () => {
   });
 
   app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
-
-  //DB
 
   //SESSION
   app.use(
@@ -82,6 +82,9 @@ const main = async () => {
 
   //categoreis route
   app.use("/api/v1", categoriesRouter);
+
+  //cart route
+  app.use("/api/v1", cartRouter);
 };
 
 main();

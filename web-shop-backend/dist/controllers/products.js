@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProductByCategory = exports.updateProduct = exports.deleteProduct = exports.addProduct = exports.getSingleProduct = exports.getAllProducts = void 0;
+exports.purchaseProduct = exports.getProductByCategory = exports.updateProduct = exports.deleteProduct = exports.addProduct = exports.getSingleProduct = exports.getAllProducts = void 0;
 const Product_1 = require("../entities/Product");
 const typeorm_1 = require("typeorm");
 const productValidation_1 = require("../validation/productValidation");
@@ -8,7 +8,9 @@ const Category_1 = require("../entities/Category");
 const getAllProducts = async (_, res) => {
     try {
         const productRepository = typeorm_1.getRepository(Product_1.Product);
-        const data = await productRepository.find({ relations: ["category"] });
+        const data = await productRepository.find({
+            relations: ["category", "carts"],
+        });
         if (data.length > 0) {
             res.json(data);
             return;
@@ -25,7 +27,7 @@ const getSingleProduct = async (req, res) => {
         const productRepository = typeorm_1.getRepository(Product_1.Product);
         const data = await productRepository.findOne({
             where: { product_id: req.params.id },
-            relations: ["category"],
+            relations: ["category", "carts"],
         });
         if (Object.keys(data).length > 0) {
             res.json(data);
@@ -157,4 +159,31 @@ const getProductByCategory = async (req, res) => {
     }
 };
 exports.getProductByCategory = getProductByCategory;
+const purchaseProduct = async (req, res) => {
+    try {
+        const productRepository = typeorm_1.getRepository(Product_1.Product);
+        const dbProduct = await productRepository
+            .createQueryBuilder("product")
+            .setLock("pessimistic_write")
+            .useTransaction(true)
+            .where("product_id=:id", { id: req.params.id })
+            .getOne();
+        dbProduct.amount -= 1;
+        await productRepository.save(dbProduct);
+        res.json({
+            message: "Transaction complete, item purchased",
+            product: dbProduct,
+        });
+    }
+    catch (err) {
+        res.json({
+            error: {
+                field: "",
+                message: "Something went wrong, try again later",
+                error: err,
+            },
+        });
+    }
+};
+exports.purchaseProduct = purchaseProduct;
 //# sourceMappingURL=products.js.map

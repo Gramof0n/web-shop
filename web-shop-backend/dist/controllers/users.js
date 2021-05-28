@@ -8,9 +8,10 @@ const argon2_1 = __importDefault(require("argon2"));
 const userValidation_1 = require("../validation/userValidation");
 const typeorm_1 = require("typeorm");
 const WebshopUser_1 = require("../entities/WebshopUser");
+const Cart_1 = require("../entities/Cart");
 const getUsers = async (_, res) => {
     const userRepository = typeorm_1.getRepository(WebshopUser_1.WebshopUser);
-    const data = await userRepository.find();
+    const data = await userRepository.find({ relations: ["cart"] });
     if (data.length > 0) {
         res.json(data);
     }
@@ -22,20 +23,24 @@ exports.getUsers = getUsers;
 const registerUser = async (req, res) => {
     try {
         const userRepository = typeorm_1.getRepository(WebshopUser_1.WebshopUser);
+        const cartRepository = typeorm_1.getRepository(Cart_1.Cart);
+        const cart = new Cart_1.Cart();
         const User = {
             name: req.body.name,
             surname: req.body.surname,
             username: req.body.username,
             password: req.body.password,
             email: req.body.email,
+            cart,
         };
         if (!(await userValidation_1.userValidation(res, User))) {
             return;
         }
+        await cartRepository.save(cart);
         const hashedPassword = await argon2_1.default.hash(User.password);
         User.password = hashedPassword;
         await userRepository.save(User);
-        const dbUser = await userRepository.findOne({ username: User.username });
+        const dbUser = await userRepository.findOne({ username: User.username }, { relations: ["cart"] });
         req.session.userId = dbUser === null || dbUser === void 0 ? void 0 : dbUser.webshop_user_id;
         req.session.isAdmin = dbUser === null || dbUser === void 0 ? void 0 : dbUser.is_admin;
         req.session.username = dbUser === null || dbUser === void 0 ? void 0 : dbUser.username;
@@ -82,6 +87,7 @@ const getOneUser = async (req, res) => {
                 webshop_user_id: parseInt(req.params.id),
                 is_deleted: false,
             },
+            relations: ["cart"],
         });
         typeof data !== "undefined"
             ? res.json(data)
