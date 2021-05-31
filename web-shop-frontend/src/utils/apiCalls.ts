@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 
 export class ApiCalls {
   private url: string;
@@ -16,9 +16,9 @@ export class ApiCalls {
     return ApiCalls.instance;
   }
 
-  async get(path: string) {
+  async get(path: string, config?: AxiosRequestConfig) {
     try {
-      const data = await axios.get(this.url + path);
+      const data = await axios.get(this.url + path, config);
       return data;
     } catch (err) {
       console.log(err);

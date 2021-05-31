@@ -37,3 +37,19 @@ export const addCategory = async (req: req, res: res) => {
     res.json({ error: err });
   }
 };
+
+//delete by name
+export const deleteCategoryByName = async (req: req, res: res) => {
+  try {
+    const categoryRepository = getRepository(Category);
+    const dbCategory = await categoryRepository.findOne({
+      where: { category_name: req.params.category_name },
+    });
+
+    await categoryRepository.remove(dbCategory!);
+
+    res.json({ message: "Category successfully deleted" });
+  } catch (err) {
+    res.json({ error: { field: "", message: "No such category exists" } });
+  }
+};

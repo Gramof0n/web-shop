@@ -9,9 +9,14 @@ const categoryValidation = async (res, category) => {
         where: { category_name: category.category_name },
     });
     if (typeof dbCategory !== "undefined") {
-        res.json({
-            error: { field: "name", message: "Category already exists in database" },
-        });
+        process.env.NODE_ENV == "test"
+            ? ""
+            : res.json({
+                error: {
+                    field: "name",
+                    message: "Category already exists in database",
+                },
+            });
         return false;
     }
     return true;

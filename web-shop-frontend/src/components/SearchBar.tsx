@@ -4,16 +4,26 @@ import {
   Input,
   InputRightAddon,
   IconButton,
+  InputProps,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 
-interface SearchBarProps {}
+interface SearchBarProps {
+  setSearchValue?: Function;
+}
 
-export const SearchBar: React.FC<SearchBarProps> = ({}) => {
+export const SearchBar: React.FC<SearchBarProps> = ({ setSearchValue }) => {
   return (
     <>
       <InputGroup minW={{ sm: "250px", lg: "450px", md: "300px" }}>
-        <Input type="text" color="white" />
+        <Input
+          type="text"
+          color="white"
+          onChange={(e) => {
+            console.log(e.target.value);
+            setSearchValue(e.target.value);
+          }}
+        />
         <InputRightAddon m={0} p={0} w={10}>
           <IconButton
             aria-label="search-products"

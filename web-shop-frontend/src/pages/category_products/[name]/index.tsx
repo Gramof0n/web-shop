@@ -10,6 +10,7 @@ interface Props {}
 const category_products = (props: Props) => {
   const router = useRouter();
   const [categoryName, setCategoryName] = useState<string | string[]>();
+  const [searchValue, setSearchValue] = useState<string>();
 
   useEffect(() => {
     setCategoryName(router.query.name);
@@ -20,12 +21,12 @@ const category_products = (props: Props) => {
 
   return (
     <>
-      <NavBar />
+      <NavBar setSearchValue={setSearchValue} />
       <CategoriesBar pathname={router.pathname} />
       {typeof categoryName === "undefined" ? (
         <Box>Loading...</Box>
       ) : (
-        <ProductDisplay category={categoryName} />
+        <ProductDisplay category={categoryName} searchTerm={searchValue} />
       )}
     </>
   );

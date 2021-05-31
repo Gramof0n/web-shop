@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addCategory = exports.getCategories = void 0;
+exports.deleteCategoryByName = exports.addCategory = exports.getCategories = void 0;
 const Category_1 = require("../entities/Category");
 const typeorm_1 = require("typeorm");
 const categoryValidation_1 = require("../validation/categoryValidation");
@@ -36,4 +36,18 @@ const addCategory = async (req, res) => {
     }
 };
 exports.addCategory = addCategory;
+const deleteCategoryByName = async (req, res) => {
+    try {
+        const categoryRepository = typeorm_1.getRepository(Category_1.Category);
+        const dbCategory = await categoryRepository.findOne({
+            where: { category_name: req.params.category_name },
+        });
+        await categoryRepository.remove(dbCategory);
+        res.json({ message: "Category successfully deleted" });
+    }
+    catch (err) {
+        res.json({ error: { field: "", message: "No such category exists" } });
+    }
+};
+exports.deleteCategoryByName = deleteCategoryByName;
 //# sourceMappingURL=categories.js.map

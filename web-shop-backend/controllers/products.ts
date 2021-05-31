@@ -8,12 +8,15 @@ import { Category } from "../entities/Category";
 export const getAllProducts = async (_: req, res: res) => {
   try {
     const productRepository = getRepository(Product);
+    const count = await productRepository.count();
     const data = await productRepository.find({
       relations: ["category", "carts"],
     });
 
+    //Bakci se sa paginacijom ovih dana malo, valjalo bi
+
     if (data.length > 0) {
-      res.json(data);
+      res.json({ found: count, products: data });
       return;
     }
 
@@ -166,6 +169,9 @@ export const getProductByCategory = async (req: req, res: res) => {
       where: { category: dbCategory },
       relations: ["category"],
     });
+    const count = await productRepository.count({
+      where: { category: dbCategory },
+    });
 
     if (product.length === 0) {
       res.json({
@@ -174,7 +180,7 @@ export const getProductByCategory = async (req: req, res: res) => {
       return;
     }
 
-    res.json(product);
+    res.json({ found: count, products: product });
   } catch (err) {
     res.json({ error: err });
   }

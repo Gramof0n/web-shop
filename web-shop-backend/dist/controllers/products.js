@@ -8,11 +8,12 @@ const Category_1 = require("../entities/Category");
 const getAllProducts = async (_, res) => {
     try {
         const productRepository = typeorm_1.getRepository(Product_1.Product);
+        const count = await productRepository.count();
         const data = await productRepository.find({
             relations: ["category", "carts"],
         });
         if (data.length > 0) {
-            res.json(data);
+            res.json({ found: count, products: data });
             return;
         }
         res.json({ error: { message: "Table is empty" } });
@@ -146,13 +147,16 @@ const getProductByCategory = async (req, res) => {
             where: { category: dbCategory },
             relations: ["category"],
         });
+        const count = await productRepository.count({
+            where: { category: dbCategory },
+        });
         if (product.length === 0) {
             res.json({
                 error: { field: "category", message: "No products for this category" },
             });
             return;
         }
-        res.json(product);
+        res.json({ found: count, products: product });
     }
     catch (err) {
         res.json({ error: err });

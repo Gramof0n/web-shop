@@ -22,7 +22,9 @@ import img from "../img/placeholder.png";
 import SearchBar from "./SearchBar";
 import * as FontAwesome from "react-icons/fa";
 
-interface NavBarProps {}
+interface NavBarProps {
+  setSearchValue?: Function;
+}
 
 interface IUser {
   id?: number;
@@ -33,7 +35,7 @@ interface IUser {
     React.Dispatch<React.SetStateAction<{}>>;
 }
 
-const NavBar: React.FC<NavBarProps> = ({}) => {
+const NavBar: React.FC<NavBarProps> = ({ setSearchValue }) => {
   let body = null;
   const [user, setUser] = useState<IUser>({} as IUser);
   useEffect(() => {
@@ -177,7 +179,7 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
 
           {/* Search bar */}
           <Flex alignItems="center">
-            <SearchBar />
+            <SearchBar setSearchValue={setSearchValue} />
           </Flex>
 
           {/* Login and register */}
