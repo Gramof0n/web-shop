@@ -19,7 +19,7 @@ describe("Product endpoints", () => {
         .get("/products")
         .end((_, res) => {
           //console.log(res.body);
-          expect(res.body).to.be.an("array");
+          expect(res.body.products).to.be.an("array");
           done();
         });
     });

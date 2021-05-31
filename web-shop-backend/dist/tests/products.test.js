@@ -37,7 +37,7 @@ describe("Product endpoints", () => {
                 .request(url)
                 .get("/products")
                 .end((_, res) => {
-                chai_1.expect(res.body).to.be.an("array");
+                chai_1.expect(res.body.products).to.be.an("array");
                 done();
             });
         });
