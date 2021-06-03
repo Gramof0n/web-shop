@@ -20,7 +20,6 @@ const CategoriesBar = (props: Props) => {
 
   async function getCategories() {
     const res = await api.get("/categories");
-    console.log(res);
     setCategories(res.data);
   }
   return (
@@ -34,7 +33,6 @@ const CategoriesBar = (props: Props) => {
     >
       <Grid gridTemplateColumns="repeat(10, 1fr)" minW="70%">
         {categories.map((category, index) => {
-          console.log(category);
           return (
             <Box key={index} ml={3} fontSize={16}>
               <NextLink

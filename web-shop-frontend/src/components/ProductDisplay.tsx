@@ -1,9 +1,8 @@
 import { Grid } from "@chakra-ui/layout";
 import { Flex, Spinner } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
-import { Error_type, Product_type } from "../types";
-import { getProducts } from "../utils/getProducts";
+import useGetProducts from "../utils/useGetProducts";
 import { Product } from "./Product";
 
 interface ProductDisplayProps {
@@ -16,14 +15,33 @@ export const ProductDisplay: React.FC<ProductDisplayProps> = ({
   searchTerm,
 }) => {
   const baseUrl = "http://localhost:4000/";
-  const [products, setProducts] = useState<Array<Product_type>>([]);
-  const [errors, setErrors] = useState<Error_type>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [pageNo, setPageNo] = useState<number>(1);
+
+  const observer = useRef<IntersectionObserver>();
 
   useEffect(() => {
-    setErrors(null);
-    getProducts(setProducts, setErrors, setIsLoading, category, searchTerm);
+    setPageNo(1);
   }, [category, searchTerm]);
+
+  const { products, errors, isLoading, hasMore, isFetchingMore } =
+    useGetProducts(category, searchTerm, pageNo);
+
+  const lastProductRef = useCallback(
+    (product) => {
+      console.log(`HAS MORE PRODUCTS? ${hasMore}`);
+      if (isLoading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPageNo((previousPage) => previousPage + 1);
+        }
+      });
+
+      if (product) observer.current.observe(product);
+    },
+    [isLoading, hasMore]
+  );
 
   return (
     <Flex
@@ -52,19 +70,42 @@ export const ProductDisplay: React.FC<ProductDisplayProps> = ({
           {errors !== null ? (
             <Flex>{errors.message}</Flex>
           ) : (
-            products.map((data, index) => {
-              return (
-                <Product
-                  key={index}
-                  name={data.name}
-                  description={data.description}
-                  productImage={baseUrl + data.img_url}
-                  amount={data.amount}
-                  price={data.price}
-                  category={data.category.category_name}
-                />
-              );
-            })
+            <>
+              {products.map((data, index) => {
+                if (products.length === index + 1) {
+                  return (
+                    <Product
+                      refs={lastProductRef}
+                      key={index}
+                      name={data.name}
+                      description={data.description}
+                      productImage={baseUrl + data.img_url}
+                      amount={data.amount}
+                      price={data.price}
+                      category={data.category.category_name}
+                    />
+                  );
+                }
+                return (
+                  <Product
+                    key={index}
+                    name={data.name}
+                    description={data.description}
+                    productImage={baseUrl + data.img_url}
+                    amount={data.amount}
+                    price={data.price}
+                    category={data.category.category_name}
+                  />
+                );
+              })}
+              {isFetchingMore ? (
+                <Flex w="100%" alignContent="center" justifyContent="center">
+                  <Spinner size="xl" />
+                </Flex>
+              ) : (
+                ""
+              )}
+            </>
           )}
         </Grid>
       )}

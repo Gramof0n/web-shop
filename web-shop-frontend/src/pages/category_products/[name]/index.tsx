@@ -14,10 +14,10 @@ const category_products = (props: Props) => {
 
   useEffect(() => {
     setCategoryName(router.query.name);
-    console.log("Use effect");
+    console.log("Use effect index");
   }, [router]);
 
-  console.log("KATEGORIJA IZ KATEGORIJE PROIZVODA: " + categoryName);
+  //console.log("KATEGORIJA IZ KATEGORIJE PROIZVODA: " + categoryName);
 
   return (
     <>

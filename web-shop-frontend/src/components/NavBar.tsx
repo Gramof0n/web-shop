@@ -46,8 +46,6 @@ const NavBar: React.FC<NavBarProps> = ({ setSearchValue }) => {
     user();
   }, []);
 
-  console.log(user.id);
-
   async function logout() {
     await axios.get("http://localhost:4000/api/v1/users/logout");
     setUser({} as IUser);

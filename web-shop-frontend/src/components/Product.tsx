@@ -19,6 +19,7 @@ interface ProductProps {
   amount: number;
   category: string;
   price: number;
+  refs?: React.LegacyRef<HTMLDivElement>;
 }
 
 export const Product: React.FC<ProductProps> = ({
@@ -28,11 +29,11 @@ export const Product: React.FC<ProductProps> = ({
   amount,
   category,
   price,
+  refs,
 }) => {
-  console.log(productImage);
   const toast = useToast();
   return (
-    <Flex flexDir="column" border="1px solid black" p={5}>
+    <Flex flexDir="column" border="1px solid black" p={5} ref={refs}>
       <Flex justifyContent="center">
         <Image src={productImage} alt={name} boxSize="200px" />
       </Flex>
