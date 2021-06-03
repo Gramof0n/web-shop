@@ -5,15 +5,26 @@ const Product_1 = require("../entities/Product");
 const typeorm_1 = require("typeorm");
 const productValidation_1 = require("../validation/productValidation");
 const Category_1 = require("../entities/Category");
-const getAllProducts = async (_, res) => {
+const pagination_1 = require("../utils/pagination");
+const getAllProducts = async (req, res) => {
     try {
         const productRepository = typeorm_1.getRepository(Product_1.Product);
-        const count = await productRepository.count();
+        const searchTerm = typeof req.query.search_term !== "undefined"
+            ? req.query.search_term
+            : "%";
+        const count = await productRepository.count({
+            where: { name: typeorm_1.ILike(`%${searchTerm}%`) },
+        });
+        const [pagination_data, take, skip] = pagination_1.pagination(req.query.page, count);
+        console.log("Search term: " + searchTerm);
         const data = await productRepository.find({
             relations: ["category", "carts"],
+            where: { name: typeorm_1.ILike(`%${searchTerm}%`) },
+            skip: skip,
+            take: take,
         });
         if (data.length > 0) {
-            res.json({ found: count, products: data });
+            res.json({ found: count, pagination_data, products: data });
             return;
         }
         res.json({ error: { message: "Table is empty" } });
@@ -143,12 +154,18 @@ const getProductByCategory = async (req, res) => {
             });
             return;
         }
-        const product = await productRepository.find({
-            where: { category: dbCategory },
-            relations: ["category"],
-        });
+        const searchTerm = typeof req.query.search_term !== "undefined"
+            ? req.query.search_term
+            : "%";
         const count = await productRepository.count({
-            where: { category: dbCategory },
+            where: { category: dbCategory, name: typeorm_1.ILike(`%${searchTerm}%`) },
+        });
+        const [pagination_data, take, skip] = pagination_1.pagination(req.query.page, count);
+        const product = await productRepository.find({
+            where: { category: dbCategory, name: typeorm_1.ILike(`%${searchTerm}%`) },
+            relations: ["category"],
+            skip,
+            take,
         });
         if (product.length === 0) {
             res.json({
@@ -156,7 +173,7 @@ const getProductByCategory = async (req, res) => {
             });
             return;
         }
-        res.json({ found: count, products: product });
+        res.json({ found: count, pagination_data, products: product });
     }
     catch (err) {
         res.json({ error: err });

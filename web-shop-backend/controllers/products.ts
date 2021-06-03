@@ -1,22 +1,38 @@
 import { Product } from "../entities/Product";
-import { getRepository } from "typeorm";
+import { getRepository, ILike } from "typeorm";
 import { Product_type, req, res } from "../types";
 import { productValidation } from "../validation/productValidation";
 import { Category } from "../entities/Category";
+import { pagination } from "../utils/pagination";
 
 //get all
-export const getAllProducts = async (_: req, res: res) => {
+export const getAllProducts = async (req: req, res: res) => {
   try {
     const productRepository = getRepository(Product);
-    const count = await productRepository.count();
-    const data = await productRepository.find({
-      relations: ["category", "carts"],
+
+    const searchTerm =
+      typeof req.query.search_term !== "undefined"
+        ? req.query.search_term
+        : "%";
+
+    const count = await productRepository.count({
+      where: { name: ILike(`%${searchTerm}%`) },
     });
 
-    //Bakci se sa paginacijom ovih dana malo, valjalo bi
+    //pagination
+    const [pagination_data, take, skip] = pagination(req.query.page, count);
+
+    console.log("Search term: " + searchTerm);
+
+    const data = await productRepository.find({
+      relations: ["category", "carts"],
+      where: { name: ILike(`%${searchTerm}%`) },
+      skip: skip,
+      take: take,
+    });
 
     if (data.length > 0) {
-      res.json({ found: count, products: data });
+      res.json({ found: count, pagination_data, products: data });
       return;
     }
 
@@ -165,12 +181,23 @@ export const getProductByCategory = async (req: req, res: res) => {
       return;
     }
 
-    const product = await productRepository.find({
-      where: { category: dbCategory },
-      relations: ["category"],
-    });
+    const searchTerm =
+      typeof req.query.search_term !== "undefined"
+        ? req.query.search_term
+        : "%";
+
     const count = await productRepository.count({
-      where: { category: dbCategory },
+      where: { category: dbCategory, name: ILike(`%${searchTerm}%`) },
+    });
+
+    //pagination
+    const [pagination_data, take, skip] = pagination(req.query.page, count);
+
+    const product = await productRepository.find({
+      where: { category: dbCategory, name: ILike(`%${searchTerm}%`) },
+      relations: ["category"],
+      skip,
+      take,
     });
 
     if (product.length === 0) {
@@ -180,7 +207,7 @@ export const getProductByCategory = async (req: req, res: res) => {
       return;
     }
 
-    res.json({ found: count, products: product });
+    res.json({ found: count, pagination_data, products: product });
   } catch (err) {
     res.json({ error: err });
   }
