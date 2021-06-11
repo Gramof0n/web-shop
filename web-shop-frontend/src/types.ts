@@ -15,3 +15,8 @@ export type Error_type = {
   message?: string;
   field?: string;
 };
+
+export type Cart_type = {
+  products: [Product_type];
+  total_price: number;
+};

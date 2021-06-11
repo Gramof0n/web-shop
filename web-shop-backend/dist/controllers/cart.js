@@ -47,7 +47,9 @@ const addProductToCart = async (req, res) => {
         for (let p of dbCart === null || dbCart === void 0 ? void 0 : dbCart.products) {
             console.table({ product: p, DataBaseProduct: dbProduct });
             if (p.product_id === (dbProduct === null || dbProduct === void 0 ? void 0 : dbProduct.product_id)) {
-                res.json({ error: { field: "", message: "Product already in cart" } });
+                res.json({
+                    error: { field: "exists", message: "Product already in cart" },
+                });
                 return;
             }
         }
@@ -81,12 +83,14 @@ const removeProductFromCart = async (req, res) => {
             where: { user: dbUser },
         });
         if (dbCart.products.length === 0) {
-            res.json({ error: { field: "", message: "Cart is empty" } });
+            res.json({ error: { field: "empty", message: "Cart is empty" } });
             return;
         }
         const id = dbCart.products.find((product) => product.product_id === dbProduct.product_id);
         if (typeof id === "undefined") {
-            res.json({ error: { field: "", message: "No such product in cart" } });
+            res.json({
+                error: { field: "no_product", message: "No such product in cart" },
+            });
             return;
         }
         dbCart.products = dbCart.products.filter((product, _) => {
@@ -121,7 +125,7 @@ const removeAllFromCart = async (req, res) => {
             where: { user: dbUser },
         });
         if (dbCart.products.length === 0) {
-            res.json({ error: { field: "", message: "Cart is empty" } });
+            res.json({ error: { field: "empty", message: "Cart is empty" } });
             return;
         }
         dbCart.products = [];

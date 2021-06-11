@@ -2,6 +2,7 @@ import { Grid } from "@chakra-ui/layout";
 import { Flex, Spinner } from "@chakra-ui/react";
 import React, { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
+import { BASE_API_URL } from "../constants";
 import useGetProducts from "../utils/useGetProducts";
 import { Product } from "./Product";
 
@@ -14,7 +15,6 @@ export const ProductDisplay: React.FC<ProductDisplayProps> = ({
   category,
   searchTerm,
 }) => {
-  const baseUrl = "http://localhost:4000/";
   const [pageNo, setPageNo] = useState<number>(1);
 
   const observer = useRef<IntersectionObserver>();
@@ -66,6 +66,7 @@ export const ProductDisplay: React.FC<ProductDisplayProps> = ({
           m="0"
           p="10"
           maxW={{ sm: "100%", md: "100%", lg: "100%", "2xl": "70%" }}
+          flex={1}
         >
           {errors !== null ? (
             <Flex>{errors.message}</Flex>
@@ -79,10 +80,11 @@ export const ProductDisplay: React.FC<ProductDisplayProps> = ({
                       key={index}
                       name={data.name}
                       description={data.description}
-                      productImage={baseUrl + data.img_url}
+                      productImage={BASE_API_URL + data.img_url}
                       amount={data.amount}
                       price={data.price}
                       category={data.category.category_name}
+                      id={data.product_id}
                     />
                   );
                 }
@@ -91,10 +93,11 @@ export const ProductDisplay: React.FC<ProductDisplayProps> = ({
                     key={index}
                     name={data.name}
                     description={data.description}
-                    productImage={baseUrl + data.img_url}
+                    productImage={BASE_API_URL + data.img_url}
                     amount={data.amount}
                     price={data.price}
                     category={data.category.category_name}
+                    id={data.product_id}
                   />
                 );
               })}

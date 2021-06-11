@@ -11,8 +11,12 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import * as FontAwesome from "react-icons/fa";
+import NextLink from "next/link";
+import { ApiCalls } from "../utils/apiCalls";
+import { addToCart } from "../utils/addToCart";
 
 interface ProductProps {
+  id?: number;
   name: string;
   description: string;
   productImage: string;
@@ -22,6 +26,8 @@ interface ProductProps {
   refs?: React.LegacyRef<HTMLDivElement>;
 }
 
+const api = ApiCalls.getInstance();
+
 export const Product: React.FC<ProductProps> = ({
   name,
   description,
@@ -30,13 +36,17 @@ export const Product: React.FC<ProductProps> = ({
   category,
   price,
   refs,
+  id,
 }) => {
   const toast = useToast();
+
   return (
     <Flex flexDir="column" border="1px solid black" p={5} ref={refs}>
-      <Flex justifyContent="center">
-        <Image src={productImage} alt={name} boxSize="200px" />
-      </Flex>
+      <NextLink href={`../product/${id}`}>
+        <Flex justifyContent="center" cursor="pointer">
+          <Image src={productImage} alt={name} boxSize="200px" />
+        </Flex>
+      </NextLink>
       <Text fontSize="2xl" textAlign="center" fontWeight="bold" mb={5}>
         {name}
       </Text>
@@ -68,7 +78,9 @@ export const Product: React.FC<ProductProps> = ({
       >
         <Tooltip label="Details" backgroundColor="blackAlpha.800" color="white">
           <Link gridColumnStart={2}>
-            <FontAwesome.FaInfo size={30} color="blackAlpha.800" />
+            <NextLink href={`../product/${id}`}>
+              <FontAwesome.FaInfo size={30} color="blackAlpha.800" />
+            </NextLink>
           </Link>
         </Tooltip>
 
@@ -79,13 +91,10 @@ export const Product: React.FC<ProductProps> = ({
         >
           <Link
             gridColumnStart={4}
-            onClick={() => {
-              toast({
-                title: "Product added",
-                description: "Product has been successfully added to cart!",
-                status: "success",
-                duration: 1000,
-              });
+            onClick={async () => {
+              const message = await addToCart(id);
+
+              toast(message);
             }}
           >
             <FontAwesome.FaCartPlus size={30} color="blackAlpha.800" />

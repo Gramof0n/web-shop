@@ -71,19 +71,21 @@ const NavBar: React.FC<NavBarProps> = ({ setSearchValue }) => {
     body = (
       <>
         <Box>
-          <Button
-            textAlign="center"
-            variant="link"
-            color="white"
-            onClick={() => {}}
-            fontSize={{ "2xl": "lg", lg: "lg", md: "md", sm: "sm" }}
-          >
-            Cart
-            <FontAwesome.FaShoppingCart
+          <NextLink href="../cart">
+            <Button
+              textAlign="center"
+              variant="link"
               color="white"
-              style={{ marginRight: 15, marginLeft: 5 }}
-            />
-          </Button>
+              onClick={() => {}}
+              fontSize={{ "2xl": "lg", lg: "lg", md: "md", sm: "sm" }}
+            >
+              Cart
+              <FontAwesome.FaShoppingCart
+                color="white"
+                style={{ marginRight: 15, marginLeft: 5 }}
+              />
+            </Button>
+          </NextLink>
         </Box>
 
         <Popover placement="bottom-start">
