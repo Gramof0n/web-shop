@@ -41,7 +41,7 @@ const CategoriesBar = (props: Props) => {
                   query: { name: category.category_name },
                 }}
               >
-                <Link mr={4} color="white">
+                <Link mr={4} color="white" fontSize="lg">
                   {category.category_name}
                 </Link>
               </NextLink>

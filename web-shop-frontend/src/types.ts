@@ -20,3 +20,11 @@ export type Cart_type = {
   products: [Product_type];
   total_price: number;
 };
+
+export type User_type = {
+  webshop_user_id: number;
+  name: string;
+  surname: string;
+  username: string;
+  email: string;
+};

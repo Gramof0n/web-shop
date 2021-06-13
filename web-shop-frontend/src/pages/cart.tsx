@@ -1,5 +1,6 @@
 import { Flex, Grid, Text } from "@chakra-ui/layout";
 import { Box, Button, useToast } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import CategoriesBar from "../components/CategoriesBar";
 import NavBar from "../components/NavBar";
@@ -13,6 +14,7 @@ interface Props {}
 const api = ApiCalls.getInstance();
 
 const cart = (props: Props) => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [cartData, setCartData] = useState<Cart_type>();
   const [loggedUserId, setLoggedUserId] = useState<number>();
@@ -55,18 +57,30 @@ const cart = (props: Props) => {
           ) : (
             <>
               <Box>
-                <Flex flexDir="column">
-                  {cartData.products.map((product, index) => {
-                    return (
-                      <ProductCartDisplay
-                        key={index}
-                        product={product}
-                        user_id={loggedUserId}
-                        getUserCart={getUserCart}
-                      />
-                    );
-                  })}
-                </Flex>
+                {cartData.products.length < 1 ? (
+                  <Flex
+                    flexDir="column"
+                    flexGrow={1}
+                    alignItems="center"
+                    justifyContent="center"
+                    h="100%"
+                  >
+                    <Text fontSize="2xl">Cart is empty.</Text>
+                  </Flex>
+                ) : (
+                  <Flex flexDir="column">
+                    {cartData.products.map((product, index) => {
+                      return (
+                        <ProductCartDisplay
+                          key={index}
+                          product={product}
+                          user_id={loggedUserId}
+                          getUserCart={getUserCart}
+                        />
+                      );
+                    })}
+                  </Flex>
+                )}
               </Box>
               <Flex
                 justifyContent="center"
@@ -86,43 +100,31 @@ const cart = (props: Props) => {
                   alignSelf="center"
                   w="20em"
                   mb={5}
-                  onClick={async () => {
-                    try {
-                      await api.get(
-                        `/product/purchase-multiple?ids=${cartData.products.map(
-                          (prod) => parseInt(prod.product_id + ",")
-                        )}`
-                      );
-
-                      await api.get(`/cart/clear/${loggedUserId}`);
-
-                      getUserCart();
-
-                      toast({
-                        title: "Purchase successfull!",
-                        description: "Thank you for your purchase",
-                        status: "success",
-                        duration: 2000,
-                      });
-                    } catch (err) {
-                      toast({
-                        title: "Error",
-                        description: "Something went wrong",
-                        status: "error",
-                        duration: 2000,
-                      });
-                    }
+                  disabled={cartData.products.length < 1 ? true : false}
+                  onClick={() => {
+                    router.push({
+                      pathname: "/checkout",
+                      query: { cartData: JSON.stringify(cartData) },
+                    });
                   }}
                 >
-                  Checkout
+                  Go to checkout
                 </Button>
-
                 <Button
                   colorScheme="red"
                   alignSelf="center"
                   w="20em"
                   onClick={async () => {
                     try {
+                      if (cartData.products.length < 1) {
+                        toast({
+                          title: "Error",
+                          description: "Can't clear what's already empty",
+                          status: "error",
+                          duration: 2000,
+                        });
+                        return;
+                      }
                       await api.get(`/cart/clear/${loggedUserId}`);
                       await getUserCart();
 
