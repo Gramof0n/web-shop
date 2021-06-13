@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.purchaseProduct = exports.getProductByCategory = exports.updateProduct = exports.deleteProduct = exports.addProduct = exports.getSingleProduct = exports.getAllProducts = void 0;
+exports.purchaseMultipleProducts = exports.purchaseProduct = exports.getProductByCategory = exports.updateProduct = exports.deleteProduct = exports.addProduct = exports.getSingleProduct = exports.getAllProducts = void 0;
 const Product_1 = require("../entities/Product");
 const typeorm_1 = require("typeorm");
 const productValidation_1 = require("../validation/productValidation");
@@ -187,7 +187,7 @@ const purchaseProduct = async (req, res) => {
             .createQueryBuilder("product")
             .setLock("pessimistic_write")
             .useTransaction(true)
-            .where("product_id=:id", { id: req.params.id })
+            .where("product_id= :id", { id: req.params.id })
             .getOne();
         dbProduct.amount -= 1;
         await productRepository.save(dbProduct);
@@ -207,4 +207,34 @@ const purchaseProduct = async (req, res) => {
     }
 };
 exports.purchaseProduct = purchaseProduct;
+const purchaseMultipleProducts = async (req, res) => {
+    var _a;
+    try {
+        const ids = (_a = req.query.ids) === null || _a === void 0 ? void 0 : _a.toString().split(",").map((id) => parseInt(id));
+        console.log("IDS: " + ids);
+        const productRepository = typeorm_1.getRepository(Product_1.Product);
+        const dbProducts = await productRepository
+            .createQueryBuilder("product")
+            .setLock("pessimistic_write")
+            .useTransaction(true)
+            .where("product_id IN (:...ids)", { ids: ids })
+            .getMany();
+        dbProducts.map((prod) => (prod.amount -= 1));
+        await productRepository.save(dbProducts);
+        res.json({
+            message: "Transaction complete, items purchased",
+            products: dbProducts,
+        });
+    }
+    catch (err) {
+        res.json({
+            error: {
+                field: "",
+                message: "Something went wrong, try again later",
+                error: err,
+            },
+        });
+    }
+};
+exports.purchaseMultipleProducts = purchaseMultipleProducts;
 //# sourceMappingURL=products.js.map

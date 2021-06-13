@@ -13,5 +13,7 @@ router.post("/products", multer_1.upload.single("productImage"), products_1.addP
 router.delete("/products/:id", products_1.deleteProduct);
 router.put("/products/:id", multer_1.upload.single("productImage"), products_1.updateProduct);
 router.get("/products/category/:category", products_1.getProductByCategory);
+router.get("/product/purchase/:id", products_1.purchaseProduct);
+router.get("/product/purchase-multiple", products_1.purchaseMultipleProducts);
 exports.default = router;
 //# sourceMappingURL=products.js.map

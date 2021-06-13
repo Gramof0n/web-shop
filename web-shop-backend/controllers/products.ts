@@ -221,7 +221,7 @@ export const purchaseProduct = async (req: req, res: res) => {
       .createQueryBuilder("product")
       .setLock("pessimistic_write")
       .useTransaction(true)
-      .where("product_id=:id", { id: req.params.id })
+      .where("product_id= :id", { id: req.params.id })
       .getOne();
 
     dbProduct!.amount -= 1;
@@ -231,6 +231,41 @@ export const purchaseProduct = async (req: req, res: res) => {
     res.json({
       message: "Transaction complete, item purchased",
       product: dbProduct,
+    });
+  } catch (err) {
+    res.json({
+      error: {
+        field: "",
+        message: "Something went wrong, try again later",
+        error: err,
+      },
+    });
+  }
+};
+
+export const purchaseMultipleProducts = async (req: req, res: res) => {
+  try {
+    const ids: Array<number> | undefined = req.query.ids
+      ?.toString()
+      .split(",")
+      .map((id) => parseInt(id));
+    console.log("IDS: " + ids);
+    const productRepository = getRepository(Product);
+
+    const dbProducts = await productRepository
+      .createQueryBuilder("product")
+      .setLock("pessimistic_write")
+      .useTransaction(true)
+      .where("product_id IN (:...ids)", { ids: ids })
+      .getMany();
+
+    dbProducts.map((prod) => (prod.amount -= 1));
+
+    await productRepository.save(dbProducts);
+
+    res.json({
+      message: "Transaction complete, items purchased",
+      products: dbProducts,
     });
   } catch (err) {
     res.json({

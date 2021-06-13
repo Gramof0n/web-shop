@@ -20,22 +20,20 @@ const cart = (props: Props) => {
   const toast = useToast();
   useEffect(() => {
     getUserCart();
-  }, [cartData]);
+  }, []);
 
   async function getUserCart() {
     const user = await getUser();
 
-    console.log(user);
     const cart = await api.get(`/cart/${user.id}`);
 
-    console.log(cart.data);
     setCartData(cart.data);
     setLoggedUserId(user.id);
     setIsLoading(false);
   }
   return (
     <>
-      <NavBar />
+      <NavBar isSearchbarEnabled={false} />
       <CategoriesBar pathname={`category_products/[name]`} />
 
       <Flex flexDirection="row" flexGrow={1} w="100%" justifyContent="center">
@@ -56,22 +54,26 @@ const cart = (props: Props) => {
             <Box>Loading...</Box>
           ) : (
             <>
-              <Flex flexDir="column">
-                {cartData.products.map((product, index) => {
-                  return (
-                    <ProductCartDisplay
-                      key={index}
-                      product={product}
-                      user_id={loggedUserId}
-                    />
-                  );
-                })}
-              </Flex>
+              <Box>
+                <Flex flexDir="column">
+                  {cartData.products.map((product, index) => {
+                    return (
+                      <ProductCartDisplay
+                        key={index}
+                        product={product}
+                        user_id={loggedUserId}
+                        getUserCart={getUserCart}
+                      />
+                    );
+                  })}
+                </Flex>
+              </Box>
               <Flex
                 justifyContent="center"
                 flexDir="column"
                 w="100%"
                 backgroundColor="whiteAlpha.800"
+                justifySelf="center"
               >
                 <Text fontSize="5xl" alignSelf="center" mb={5}>
                   Total: {cartData.total_price}€{" "}
@@ -79,7 +81,39 @@ const cart = (props: Props) => {
                 <Text fontSize="3xl" alignSelf="center" mb={5}>
                   Items in cart: {cartData.products.length}
                 </Text>
-                <Button colorScheme="green" alignSelf="center" w="20em" mb={5}>
+                <Button
+                  colorScheme="green"
+                  alignSelf="center"
+                  w="20em"
+                  mb={5}
+                  onClick={async () => {
+                    try {
+                      await api.get(
+                        `/product/purchase-multiple?ids=${cartData.products.map(
+                          (prod) => parseInt(prod.product_id + ",")
+                        )}`
+                      );
+
+                      await api.get(`/cart/clear/${loggedUserId}`);
+
+                      getUserCart();
+
+                      toast({
+                        title: "Purchase successfull!",
+                        description: "Thank you for your purchase",
+                        status: "success",
+                        duration: 2000,
+                      });
+                    } catch (err) {
+                      toast({
+                        title: "Error",
+                        description: "Something went wrong",
+                        status: "error",
+                        duration: 2000,
+                      });
+                    }
+                  }}
+                >
                   Checkout
                 </Button>
 
@@ -90,6 +124,8 @@ const cart = (props: Props) => {
                   onClick={async () => {
                     try {
                       await api.get(`/cart/clear/${loggedUserId}`);
+                      await getUserCart();
+
                       toast({
                         title: "Cart cleared",
                         description: "All products removed from cart!",

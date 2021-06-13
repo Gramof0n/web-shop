@@ -4,6 +4,8 @@ import {
   getAllProducts,
   getProductByCategory,
   getSingleProduct,
+  purchaseMultipleProducts,
+  purchaseProduct,
   updateProduct,
 } from "../controllers/products";
 import express from "express";
@@ -28,5 +30,11 @@ router.put("/products/:id", upload.single("productImage"), updateProduct);
 
 //get by category
 router.get("/products/category/:category", getProductByCategory);
+
+//purchase one product
+router.get("/product/purchase/:id", purchaseProduct);
+
+//purchase multiple
+router.get("/product/purchase-multiple", purchaseMultipleProducts);
 
 export default router;

@@ -24,6 +24,7 @@ import * as FontAwesome from "react-icons/fa";
 
 interface NavBarProps {
   setSearchValue?: Function;
+  isSearchbarEnabled: boolean;
 }
 
 interface IUser {
@@ -35,7 +36,10 @@ interface IUser {
     React.Dispatch<React.SetStateAction<{}>>;
 }
 
-const NavBar: React.FC<NavBarProps> = ({ setSearchValue }) => {
+const NavBar: React.FC<NavBarProps> = ({
+  setSearchValue,
+  isSearchbarEnabled,
+}) => {
   let body = null;
   const [user, setUser] = useState<IUser>({} as IUser);
   useEffect(() => {
@@ -105,21 +109,23 @@ const NavBar: React.FC<NavBarProps> = ({ setSearchValue }) => {
             <PopoverContent>
               <PopoverHeader>Welcome {user.username}</PopoverHeader>
               <PopoverBody>
-                <Button
-                  textAlign="center"
-                  variant="link"
-                  color="black"
-                  onClick={async () => {
-                    await logout();
-                  }}
-                >
-                  Logout{" "}
-                  <FontAwesome.FaSignOutAlt
-                    style={{ marginLeft: 5 }}
+                <NextLink href="../">
+                  <Button
+                    textAlign="center"
+                    variant="link"
                     color="black"
-                    size={20}
-                  />
-                </Button>
+                    onClick={async () => {
+                      await logout();
+                    }}
+                  >
+                    Logout{" "}
+                    <FontAwesome.FaSignOutAlt
+                      style={{ marginLeft: 5 }}
+                      color="black"
+                      size={20}
+                    />
+                  </Button>
+                </NextLink>
               </PopoverBody>
             </PopoverContent>
           </Portal>
@@ -178,9 +184,13 @@ const NavBar: React.FC<NavBarProps> = ({ setSearchValue }) => {
           </Flex>
 
           {/* Search bar */}
-          <Flex alignItems="center">
-            <SearchBar setSearchValue={setSearchValue} />
-          </Flex>
+          {isSearchbarEnabled ? (
+            <Flex alignItems="center">
+              <SearchBar setSearchValue={setSearchValue} />
+            </Flex>
+          ) : (
+            <Box></Box>
+          )}
 
           {/* Login and register */}
           <Flex alignItems="center" justifyContent="flex-end" ml={3}>

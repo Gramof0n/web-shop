@@ -21,7 +21,7 @@ const category_products = (props: Props) => {
 
   return (
     <>
-      <NavBar setSearchValue={setSearchValue} />
+      <NavBar setSearchValue={setSearchValue} isSearchbarEnabled={true} />
       <CategoriesBar pathname={router.pathname} />
       {typeof categoryName === "undefined" ? (
         <Box>Loading...</Box>

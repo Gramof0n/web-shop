@@ -32,7 +32,7 @@ const index = (props: Props) => {
   }
   return (
     <>
-      <NavBar />
+      <NavBar isSearchbarEnabled={false} />
       <CategoriesBar pathname={`../category_products/[name]`} />
       {isLoading ? `Loading...` : <DetailedProduct product={product} />}
     </>

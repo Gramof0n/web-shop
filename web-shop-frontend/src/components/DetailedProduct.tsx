@@ -70,8 +70,14 @@ const DetailedProduct = ({ product }: Props) => {
             Description:
           </Text>
           <Text mb={10}>{product.description}</Text>
+          {product.amount < 1 ? (
+            <Text mb={10} color="red">
+              Out of stock
+            </Text>
+          ) : null}
           <Button
             colorScheme="green"
+            disabled={product.amount < 1 ? true : false}
             onClick={async () => {
               const message = await addToCart(product.product_id);
               toast(message);

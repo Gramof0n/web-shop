@@ -9,7 +9,7 @@ const index: React.FC<indexProps> = ({}) => {
   const [searchValue, setSearchValue] = useState<string>();
   return (
     <>
-      <NavBar setSearchValue={setSearchValue} />
+      <NavBar setSearchValue={setSearchValue} isSearchbarEnabled={true} />
       <CategoriesBar pathname={`category_products/[name]`} />
       <ProductDisplay searchTerm={searchValue} />
     </>
